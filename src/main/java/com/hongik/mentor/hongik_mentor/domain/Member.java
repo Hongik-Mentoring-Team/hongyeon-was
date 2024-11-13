@@ -7,5 +7,5 @@ public class Member {
     String 박승범게이;
     String 이도현게이;
     String 전형진게이;
-    String 전찬민정상;
+    String 전찬민게이;
 }
