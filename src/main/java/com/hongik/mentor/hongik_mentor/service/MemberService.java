@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor @Transactional(readOnly = true)
@@ -19,8 +21,8 @@ public class MemberService {
 
     //Create
     @Transactional
-    public void save(MemberSaveDto memberSaveDto) {
-        memberRepository.save(memberSaveDto.toEntity());
+    public Long save(MemberSaveDto memberSaveDto) {
+        return memberRepository.save(memberSaveDto.toEntity());
     }
 
     //Read
@@ -39,6 +41,7 @@ public class MemberService {
 
         return collect;
     }
+
     //Update
 
     //Delete
@@ -47,4 +50,12 @@ public class MemberService {
         memberRepository.delete(id);
     }
 
+    public Optional<MemberResponseDto> findBySocialId(String userNameAttributeName) {
+        try {
+            MemberResponseDto memberResponseDto = new MemberResponseDto(memberRepository.findBySocialId(userNameAttributeName).get());
+            return Optional.of(memberResponseDto);
+        } catch (NoSuchElementException e) {
+            return Optional.empty();
+        }
+    }
 }

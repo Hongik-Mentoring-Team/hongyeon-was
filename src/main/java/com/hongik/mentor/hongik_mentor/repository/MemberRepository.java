@@ -1,12 +1,15 @@
 package com.hongik.mentor.hongik_mentor.repository;
 
+import com.hongik.mentor.hongik_mentor.controller.dto.MemberResponseDto;
 import com.hongik.mentor.hongik_mentor.domain.Member;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.NonUniqueResultException;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class MemberRepository {
@@ -39,5 +42,18 @@ public class MemberRepository {
     public void deleteAll() {
         em.createQuery("delete from Member")
                 .executeUpdate();//delete JPQL이라서 executeUpdate()필요
+    }
+
+    public Optional<Member> findBySocialId(String userNameAttributeName) {
+        try{    //getSingleResult()는 조회 대상이 없을 경우 예외발생시킴
+            Member findMember = em.createQuery("select m from Member m where m.socialId = :userNameAttributeName", Member.class)
+                    .setParameter("userNameAttributeName", userNameAttributeName)
+                    .getSingleResult();
+            return Optional.of(findMember);
+        } catch(NonUniqueResultException e){
+            return Optional.empty();    //빈 Optional 객체 생성 반환
+        }
+
+
     }
 }
