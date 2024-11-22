@@ -26,6 +26,9 @@ import lombok.RequiredArgsConstructor;
 * 결정:
 *       socialId x provider 사용
 *
+* 3. 권한 설계
+* 의문점: 권한을 어디까지 나눠야할 필요성이 있을지 아직 모르겠음.
+*
 * */
 
 @Getter
@@ -34,26 +37,28 @@ public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)     //참고(sequence, table전략은 JPA에서 ID를 미리 할당받기에 쿼리를 지연 가능, 반면 identity는 즉시 쿼리 발생)
     @Column(name = "member_id")
-    private Long id;            //DB용 PK
+    private Long id;    //DB용 PK
     @Column(nullable = false)
-    private String socialId;    //socialId+provider를 조합하여 유저를 구분함
-    @Column(nullable = false)
-    private SocialProvider socialProvider;
-
+    private String socialId;    //~userNameAttributeName              socialId+provider를 조합하여 유저를 구분함
+    @Column(nullable = false) @Enumerated(EnumType.STRING)
+    private SocialProvider socialProvider;  //~registrationId
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
     private String major;
     @Column(nullable = false)
     private Integer graduationYear;
-    @Column(nullable = false)
+    @Column(nullable = false) @Enumerated(EnumType.STRING)
     private MemberType type;    //재학생/졸업생
+    @Column(nullable = false) @Enumerated(EnumType.STRING)
+    private Role role;
 
     private AccountStatus accountStatus; //null 주의
 
     public Member() {
     }
 
+    //Member 객체 생성이 발생하는 경우: 회원가입. but 사용자가 회원가입 화면을 보기 전에 db에 불완전Member를 넣어야하는 경우가 많음. -> 이 생성자가 필요할까?
     public Member(String socialId, SocialProvider socialProvider, String name, String major, Integer graduationYear, MemberType type, AccountStatus accountStatus) {
         this.socialId = socialId;
         this.socialProvider = socialProvider;
@@ -62,5 +67,19 @@ public class Member {
         this.graduationYear = graduationYear;
         this.type = type;
         this.accountStatus = accountStatus;
+    }
+
+    public Member(String socialId, SocialProvider socialProvider) {
+        this.socialId = socialId;
+        this.socialProvider = socialProvider;
+    }
+
+    public Long update(String name, String major, Integer graduationYear, MemberType memberType) {
+        this.name=name;
+        this.major=major;
+        this.graduationYear=graduationYear;
+        this.type = memberType;
+
+        return id;
     }
 }

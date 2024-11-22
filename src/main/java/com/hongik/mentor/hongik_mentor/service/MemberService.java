@@ -3,6 +3,7 @@ package com.hongik.mentor.hongik_mentor.service;
 import com.hongik.mentor.hongik_mentor.controller.dto.MemberResponseDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.MemberSaveDto;
 import com.hongik.mentor.hongik_mentor.domain.Member;
+import com.hongik.mentor.hongik_mentor.domain.MemberType;
 import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class MemberService {
     //Create
     @Transactional
     public Long save(MemberSaveDto memberSaveDto) {
-        return memberRepository.save(memberSaveDto.toEntity());
+        return memberRepository.save(memberSaveDto.toEntity()).getId();
     }
 
     //Read
@@ -43,6 +44,12 @@ public class MemberService {
     }
 
     //Update
+
+    @Transactional
+    public Long update(Long id, String name, String major, Integer graduationYear, MemberType memberType) {
+        Member findMember = memberRepository.findById(id);
+        return findMember.update(name, major, graduationYear, memberType);
+    }
 
     //Delete
     @Transactional

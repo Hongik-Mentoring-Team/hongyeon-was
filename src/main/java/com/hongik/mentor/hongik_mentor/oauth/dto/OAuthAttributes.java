@@ -1,39 +1,45 @@
 package com.hongik.mentor.hongik_mentor.oauth.dto;
 
+import com.hongik.mentor.hongik_mentor.domain.Member;
+import com.hongik.mentor.hongik_mentor.domain.SocialProvider;
 import lombok.Builder;
+import lombok.Getter;
 
 import java.util.Map;
 
+@Getter
 public class OAuthAttributes {
     private Map<String, Object> attributes;
     private String nameAttributeKey;    //nameAttributeKey == userNameAttributeName == socialId
     private String name;
     private String email;
     private String picture;
+    private String registrationId;
 
     @Builder
-    public OAuthAttributes(Map<String, Object> attributes, String nameAttributeKey, String name, String email, String picture) {
+    public OAuthAttributes(Map<String, Object> attributes, String nameAttributeKey, String name, String email, String picture, String registrationId) {
         this.attributes = attributes;
         this.nameAttributeKey = nameAttributeKey;
         this.name = name;
         this.email = email;
         this.picture = picture;
+        this.registrationId = registrationId;
     }
 
     //UserRequest -> OAuthAttributes 변환
     public static OAuthAttributes of(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
         if ("naver".equals(registrationId)) {
-            return ofNaver(userNameAttributeName, attributes);
+            return ofNaver(userNameAttributeName, attributes, registrationId);
         } else if ("google".equals(registrationId)) {
-            return ofGoogle(userNameAttributeName, attributes);
+            return ofGoogle(userNameAttributeName, attributes, registrationId);
         } else
-            return ofKakao(userNameAttributeName, attributes);
+            return ofKakao(userNameAttributeName, attributes, registrationId);
 
 
     }
 
     //kakao로그인용
-    private static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
+    private static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes, String registrationId) {
         /*카카오 JSON 구조
         예시임
         {
@@ -75,24 +81,26 @@ public class OAuthAttributes {
                 .name(nickname)
                 .picture(profileImageUrl)
                 .nameAttributeKey(userNameAttributeName)
+                .registrationId(registrationId)
                 .build();
     }
 
     //google로그인용
-    public static OAuthAttributes ofGoogle(String userNameAttributeName, Map<String,Object> attributes) {
+    public static OAuthAttributes ofGoogle(String userNameAttributeName, Map<String,Object> attributes, String registrationId) {
         return OAuthAttributes.builder()
                 .attributes(attributes)
                 .email(String.valueOf(attributes.get("email")))
                 .name(String.valueOf(attributes.get("name")))
                 .picture(String.valueOf(attributes.get("picture")))
                 .nameAttributeKey(userNameAttributeName)
+                .registrationId(registrationId)
                 .build();
 
     }
 
 
     //naver로그인용
-    public static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
+    public static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes,String registrationId) {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
         return OAuthAttributes.builder()
@@ -101,7 +109,12 @@ public class OAuthAttributes {
                 .name(String.valueOf(response.get("name")))
                 .picture(String.valueOf(response.get("profile_image")))
                 .nameAttributeKey(userNameAttributeName)
+                .registrationId(registrationId)
                 .build();
+    }
+
+    public Member toEntity() {
+        return new Member(nameAttributeKey, SocialProvider.from(registrationId));
     }
 
         /*

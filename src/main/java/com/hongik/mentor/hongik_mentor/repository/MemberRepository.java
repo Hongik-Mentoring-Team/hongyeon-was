@@ -2,6 +2,7 @@ package com.hongik.mentor.hongik_mentor.repository;
 
 import com.hongik.mentor.hongik_mentor.controller.dto.MemberResponseDto;
 import com.hongik.mentor.hongik_mentor.domain.Member;
+import com.hongik.mentor.hongik_mentor.domain.MemberType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +18,9 @@ public class MemberRepository {
     private EntityManager em;
 
     //Create
-    public Long save(Member member) {
+    public Member save(Member member) {
         em.persist(member);
-        return member.getId();
+        return member;
     }
 
     //Read
@@ -31,7 +32,6 @@ public class MemberRepository {
         return em.createQuery("select m from Member m", Member.class)
                 .getResultList();
     }
-    //Update
 
     //Delete
     public void delete(Long id) {
