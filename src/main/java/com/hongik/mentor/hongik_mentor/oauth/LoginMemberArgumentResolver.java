@@ -11,7 +11,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 @RequiredArgsConstructor
-@Component
+@Component  //ArgumentResolver를 스프링 빈으로 등록
 public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolver {
     private final HttpSession httpSession;
 
