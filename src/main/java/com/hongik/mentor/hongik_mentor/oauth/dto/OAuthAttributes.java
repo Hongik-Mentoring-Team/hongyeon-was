@@ -29,7 +29,7 @@ public class OAuthAttributes {
     //UserRequest -> OAuthAttributes 변환
     public static OAuthAttributes of(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
         if ("naver".equals(registrationId)) {
-            return ofNaver(userNameAttributeName, attributes, registrationId);
+            return ofNaver("id", attributes, registrationId);   //기존의 userNameAttributeName: "response"이므로 -> "id"로 변경 필요
         } else if ("google".equals(registrationId)) {
             return ofGoogle(userNameAttributeName, attributes, registrationId);
         } else

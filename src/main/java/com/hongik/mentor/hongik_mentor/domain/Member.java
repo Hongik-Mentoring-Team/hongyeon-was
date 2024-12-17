@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
+
 //회원 엔티티
 /*고려사항
 *
@@ -58,20 +60,29 @@ public class Member {
     public Member() {
     }
 
-    //Member 객체 생성이 발생하는 경우: 회원가입. but 사용자가 회원가입 화면을 보기 전에 db에 불완전Member를 넣어야하는 경우가 많음. -> 이 생성자가 필요할까?
-    public Member(String socialId, SocialProvider socialProvider, String name, String major, Integer graduationYear, MemberType type, AccountStatus accountStatus) {
+    //Member 객체 생성이 발생하는 경우: 회원가입. but 사용자가 회원가입 화면을 보기 전에 db에 불완전Member를 넣어야하는 경우가 많음. -> 이 생성자가 필요할까? => DB에 불완전한 Member는 안넣으면됨
+    //USER(정규) member생성
+    public Member(String socialId, SocialProvider socialProvider, String name, String major, Integer graduationYear) {
         this.socialId = socialId;
         this.socialProvider = socialProvider;
         this.name = name;
         this.major = major;
         this.graduationYear = graduationYear;
-        this.type = type;
-        this.accountStatus = accountStatus;
+        if (graduationYear <= LocalDate.now().getYear()) {
+            this.type = MemberType.GRADUATE;
+        } else {
+            this.type=MemberType.STUDENT;
+        }
+        this.accountStatus = AccountStatus.ACTIVE;
+        this.role = Role.USER;
+
     }
 
+    //TEMP(임시) member생성
     public Member(String socialId, SocialProvider socialProvider) {
         this.socialId = socialId;
         this.socialProvider = socialProvider;
+        this.role=Role.TEMP;
     }
 
     public Long update(String name, String major, Integer graduationYear, MemberType memberType) {

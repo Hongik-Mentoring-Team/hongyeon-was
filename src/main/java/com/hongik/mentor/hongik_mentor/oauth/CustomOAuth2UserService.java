@@ -16,10 +16,12 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Optional;
 
+@Transactional  //DB에 member 조회 쿼리를 실행시키기 위해 필요함
 @RequiredArgsConstructor
 @Service
 public class CustomOAuth2UserService implements OAuth2UserService {
@@ -65,7 +67,8 @@ public class CustomOAuth2UserService implements OAuth2UserService {
         }
         //DB에 Member 없음 == 회원가입
         else{
-            return memberRepository.save(oAuthAttributes.toEntity());
+//            return memberRepository.save(oAuthAttributes.toEntity()); //Member의 다른 멤버변수가 채워지지 않았기에 save불가
+            return oAuthAttributes.toEntity();
         }
     }
 }

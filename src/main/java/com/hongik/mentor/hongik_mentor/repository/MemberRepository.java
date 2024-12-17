@@ -46,10 +46,10 @@ public class MemberRepository {
 
     public Optional<Member> findBySocialId(String userNameAttributeName) {
         try{    //getSingleResult()는 조회 대상이 없을 경우 예외발생시킴
-            Member findMember = em.createQuery("select m from Member m where m.socialId = :userNameAttributeName", Member.class)
+            Optional<Member> findMember = em.createQuery("select m from Member m where m.socialId = :userNameAttributeName", Member.class)
                     .setParameter("userNameAttributeName", userNameAttributeName)
-                    .getSingleResult();
-            return Optional.of(findMember);
+                    .getResultStream().findFirst(); //조회 결과: 1명 조회 | 0명 조회
+            return findMember;
         } catch(NonUniqueResultException e){
             return Optional.empty();    //빈 Optional 객체 생성 반환
         }

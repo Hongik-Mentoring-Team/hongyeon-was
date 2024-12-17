@@ -14,12 +14,11 @@ public class MemberSaveDto {
     private final String name;
     private final String major;
     private final Integer graduationYear;
-    private final MemberType type;    //재학생/졸업생
 
     private AccountStatus accountStatus;
 
 
     public Member toEntity() {
-        return new Member(socialId, socialProvider, name, major, graduationYear, type,accountStatus);
+        return new Member(socialId, socialProvider, name, major, graduationYear);
     }
 }
