@@ -36,4 +36,4 @@ out/
 ### VS Code ###
 .vscode/
 
-applicatioin-oauth.properties
+/src/main/resources/applicatioin-oauth.properties
