@@ -25,8 +25,8 @@ class MemberRepositoryTest {
 
     @BeforeEach
     public void setUp() {
-        Member member1 = new Member("1", SocialProvider.GOOGLE, "olaf", "CS", 2025, MemberType.graduate, AccountStatus.ACTIVE);
-        Member member2 = new Member("2", SocialProvider.GOOGLE, "tryn", "CS", 2025, MemberType.graduate, AccountStatus.ACTIVE);
+        Member member1 = new Member("1", SocialProvider.GOOGLE, "olaf", "CS", 2025, MemberType.GRADUATE, AccountStatus.ACTIVE);
+        Member member2 = new Member("2", SocialProvider.GOOGLE, "tryn", "CS", 2025, MemberType.GRADUATE, AccountStatus.ACTIVE);
     }
 
     @AfterEach
@@ -35,11 +35,11 @@ class MemberRepositoryTest {
     }
     @Test
     void create테스트() {
-        Member member1 = new Member("1", SocialProvider.GOOGLE, "olaf", "CS", 2025, MemberType.graduate, AccountStatus.ACTIVE);
-        Member member2 = new Member("2", SocialProvider.GOOGLE, "tryn", "CS", 2025, MemberType.graduate, AccountStatus.ACTIVE);
+        Member member1 = new Member("1", SocialProvider.GOOGLE, "olaf", "CS", 2025, MemberType.GRADUATE, AccountStatus.ACTIVE);
+        Member member2 = new Member("2", SocialProvider.GOOGLE, "tryn", "CS", 2025, MemberType.GRADUATE, AccountStatus.ACTIVE);
 
-        Long id1 = memberRepository.save(member1);
-        Long id2 = memberRepository.save(member2);
+        Long id1 = memberRepository.save(member1).getId();
+        Long id2 = memberRepository.save(member2).getId();
 
         Member findMember1 = memberRepository.findById(id1);
         Member findMember2 = memberRepository.findById(id2);
@@ -53,11 +53,11 @@ class MemberRepositoryTest {
     void delete테스트() {
 
         //given
-        Member member1 = new Member("1", SocialProvider.GOOGLE, "olaf", "CS", 2025, MemberType.graduate, AccountStatus.ACTIVE);
-        Member member2 = new Member("2", SocialProvider.GOOGLE, "tryn", "CS", 2025, MemberType.graduate, AccountStatus.ACTIVE);
+        Member member1 = new Member("1", SocialProvider.GOOGLE, "olaf", "CS", 2025, MemberType.GRADUATE, AccountStatus.ACTIVE);
+        Member member2 = new Member("2", SocialProvider.GOOGLE, "tryn", "CS", 2025, MemberType.GRADUATE, AccountStatus.ACTIVE);
 
-        Long id1 = memberRepository.save(member1);
-        Long id2 = memberRepository.save(member2);
+        Long id1 = memberRepository.save(member1).getId();
+        Long id2 = memberRepository.save(member2).getId();
 
         //when
         memberRepository.deleteAll();

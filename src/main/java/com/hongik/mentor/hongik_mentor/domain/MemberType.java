@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum MemberType {
-    student("재학생"), graduate("졸업생");
+    STUDENT("재학생"), GRADUATE("졸업생");
 
     private final String title;
 }

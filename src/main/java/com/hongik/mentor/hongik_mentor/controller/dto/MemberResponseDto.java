@@ -33,7 +33,4 @@ public class MemberResponseDto {
     }
 
 
-    public void setAccountStatus(AccountStatus accountStatus) {
-        this.accountStatus=accountStatus;
-    }
 }

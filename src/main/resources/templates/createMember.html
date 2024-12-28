@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>추가 정보 입력</title>
+</head>
+<body>
+<h1>추가 정보 입력</h1>
+<form th:action="@{/member}" method="post">
+    <label for="memberName">이름:</label>
+    <input type="text" id="memberName" name="memberName" required><br>
+
+    <label for="major">전공:</label>
+    <input type="text" id="major" name="major" required><br>
+
+    <label for="graduationYear">졸업연도:</label>
+    <select id="graduationYear" name="graduationYear" required>
+        <option value="" disabled selected>연도를 선택하세요</option>
+        <option th:each="year : ${#numbers.sequence(2000, 2030)}" th:value="${year}" th:text="${year}"></option>
+    </select>
+    <br><br>
+
+    <button type="submit">제출</button>
+</form>
+</body>
+</html>
