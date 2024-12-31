@@ -3,6 +3,7 @@ package com.hongik.mentor.hongik_mentor.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class Post {
 
     @Id @GeneratedValue
@@ -23,19 +25,23 @@ public class Post {
 
     private String content;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Comment> comments = new ArrayList<>();
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
 
     @CreatedDate
     private LocalDateTime createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "member_id")
+//    private Member member;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<Tag> tags = new ArrayList<>();
+
+    public void addTags(Tag tag){
+        this.tags.add(tag);
+    }
 
 }
