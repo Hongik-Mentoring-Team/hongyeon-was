@@ -13,6 +13,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
+        default_batch_fetch_size: 100
     show-sql: true
 
   profiles:

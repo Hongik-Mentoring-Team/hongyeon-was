@@ -2,6 +2,7 @@ package com.hongik.mentor.hongik_mentor.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -38,9 +39,9 @@ public class Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @Builder.Default
-    private List<Tag> tags = new ArrayList<>();
+    private List<PostTag> tags = new ArrayList<>();
 
-    public void addTags(Tag tag){
+    public void addTags(PostTag tag){
         this.tags.add(tag);
     }
 
