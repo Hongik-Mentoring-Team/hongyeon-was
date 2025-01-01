@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class HongikMentorApplication {
 
 	public static void main(String[] args) {
-		system.out.println("lee test");
 		SpringApplication.run(HongikMentorApplication.class, args);
 	}
 

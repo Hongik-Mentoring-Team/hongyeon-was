@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 //회원 엔티티
 /*고려사항
@@ -56,6 +58,14 @@ public class Member {
     private Role role;
 
     private AccountStatus accountStatus; //null 주의
+
+    //사용자가 작성한 글 모음
+    @OneToMany(mappedBy = "poster", cascade = CascadeType.ALL)
+    private List<Post> posts = new ArrayList<>();
+
+    //사용자가 작성한 댓글 모음
+    @OneToMany(mappedBy = "commenter", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
 
     public Member() {
     }
