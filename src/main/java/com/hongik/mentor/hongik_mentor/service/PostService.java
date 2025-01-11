@@ -2,10 +2,10 @@ package com.hongik.mentor.hongik_mentor.service;
 
 import com.hongik.mentor.hongik_mentor.controller.dto.PostCreateDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostDTO;
-import com.hongik.mentor.hongik_mentor.domain.Member;
-import com.hongik.mentor.hongik_mentor.domain.Post;
-import com.hongik.mentor.hongik_mentor.domain.PostTag;
-import com.hongik.mentor.hongik_mentor.domain.Tag;
+import com.hongik.mentor.hongik_mentor.controller.dto.PostModifyDTO;
+import com.hongik.mentor.hongik_mentor.domain.*;
+import com.hongik.mentor.hongik_mentor.exception.CustomMentorException;
+import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
 import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
 import com.hongik.mentor.hongik_mentor.repository.PostRepository;
 import com.hongik.mentor.hongik_mentor.repository.TagRepository;
@@ -54,7 +54,46 @@ public class PostService {
         return post.getId();
     }
 
-    public List<PostDTO> searchPostsByTags(List<Long> tagIds){
+    public PostDTO getPost(Long postId){
+
+        Post post = postRepository.getPostById(postId)
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
+
+        return PostDTO.fromPost(post);
+    }
+
+    @Transactional
+    public Long modifyPost(PostModifyDTO postModifyDTO) {
+
+        Post post = postRepository.getPostById(postModifyDTO.getPostId())
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
+
+        List<Tag> tags = postModifyDTO.getTagIds().stream()
+                .map(id -> tagRepository.findById(id)
+                        .orElseThrow(() -> new RuntimeException("Tag not found"))).toList();
+
+        List<PostTag> postTags = tags.stream().map(tag -> PostTag.builder()
+                .post(post)
+                .tag(tag).build()).toList();
+
+        post.clearTags();
+
+        post.modifyPost(postModifyDTO.getTitle(), postModifyDTO.getContent(), postTags);
+
+        postRepository.save(post);
+
+        return post.getId();
+
+    }
+
+    @Transactional
+    public Long deletePost(Long postId){
+        postRepository.deleteById(postId);
+
+        return postId;
+    }
+
+    public List<PostDTO> searchPostsByTags(List<Long> tagIds){ // 태그들 기반 검색
         List<Post> posts = postRepository.searchByTags(tagIds);
 
         if (posts.isEmpty()) {
@@ -63,6 +102,25 @@ public class PostService {
 
         return posts.stream()
                 .map(PostDTO::fromPost).toList();
+    }
+
+    public Long thumbUp(Long postId, Long memberId) { // 좋아요 기능
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+
+        Member member = memberRepository.findById(memberId);
+
+        PostLike postLike = PostLike.builder()
+                .member(member)
+                .post(post)
+                .build();
+
+        post.addLikes(postLike);
+
+        postRepository.save(post);
+
+        return post.getId();
+
     }
 
 }

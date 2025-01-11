@@ -10,6 +10,7 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 
 public class PostSearchRepositoryImpl implements PostSearchRepository{
 
@@ -17,6 +18,18 @@ public class PostSearchRepositoryImpl implements PostSearchRepository{
 
     public PostSearchRepositoryImpl(EntityManager em) {
         this.queryFactory = new JPAQueryFactory(em);
+    }
+
+    public Optional<Post> getPostById(Long id) {
+        QPost p = QPost.post;
+
+        Post post = queryFactory
+                .select(p)
+                .from(p)
+                .where(p.id.eq(id))
+                .fetchOne();
+
+        return Optional.ofNullable(post);
     }
 
     @Override

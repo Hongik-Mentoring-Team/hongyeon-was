@@ -18,22 +18,18 @@ public class TagInitializer {
 
             Tag tag = Tag.builder()
                     .name("금융권")
-                    .post(null)
                     .build();
 
             Tag tag1 = Tag.builder()
                     .name("대기업 SI")
-                    .post(null)
                     .build();
 
             Tag tag2 = Tag.builder()
                     .name("백엔드 개발자")
-                    .post(null)
                     .build();
 
             Tag tag3 = Tag.builder()
                     .name("프론트엔드 개발자")
-                    .post(null)
                     .build();
 
             tagRepository.save(tag);
