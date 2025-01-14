@@ -1,11 +1,9 @@
 package com.hongik.mentor.hongik_mentor.domain;
 
 
+import com.hongik.mentor.hongik_mentor.domain.tier.Tier;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -57,10 +55,14 @@ public class Member {
     private MemberType type;    //재학생/졸업생
     @Column(nullable = false) @Enumerated(EnumType.STRING)
     private Role role;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MemberBadge> badges = new ArrayList<>();
-
     private String mainBadgeUrl;
+
+    @Enumerated(EnumType.STRING)
+    private Tier tier;
+    private Long rank;
 
     private AccountStatus accountStatus; //null 주의
 
@@ -82,7 +84,8 @@ public class Member {
         }
         this.accountStatus = AccountStatus.ACTIVE;
         this.role = Role.USER;
-
+        this.tier = Tier.BRONZE;
+        this.rank = 0L;
     }
 
     //TEMP(임시) member생성
