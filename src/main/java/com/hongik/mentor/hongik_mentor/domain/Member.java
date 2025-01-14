@@ -5,8 +5,11 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 //회원 엔티티
 /*고려사항
@@ -54,6 +57,10 @@ public class Member {
     private MemberType type;    //재학생/졸업생
     @Column(nullable = false) @Enumerated(EnumType.STRING)
     private Role role;
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<MemberBadge> badges = new ArrayList<>();
+
+    private String mainBadgeUrl;
 
     private AccountStatus accountStatus; //null 주의
 
@@ -92,5 +99,13 @@ public class Member {
         this.type = memberType;
 
         return id;
+    }
+
+    public void addBadge(MemberBadge memberBadge) {
+        this.badges.add(memberBadge);
+    }
+
+    public void setMainBadgeUrl(String url) {
+        this.mainBadgeUrl=url;
     }
 }

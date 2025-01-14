@@ -1,6 +1,7 @@
 package com.hongik.mentor.hongik_mentor.repository;
 
 import com.hongik.mentor.hongik_mentor.domain.Badge;
+import com.hongik.mentor.hongik_mentor.domain.MemberBadge;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +14,15 @@ import java.util.List;
 public class BadgeRepository {
     @PersistenceContext
     private final EntityManager em;
+
     //create
-    public void save(Badge badge) {
+    public Long save(Badge badge) {
         em.persist(badge);
+        return badge.getId();
+    }
+
+    public void saveMemberBadge(MemberBadge memberBadge) {
+        em.persist(memberBadge);
     }
 
     //read
@@ -35,5 +42,11 @@ public class BadgeRepository {
     public void delete(Long id) {
         Badge findBadge = em.find(Badge.class, id);
         em.remove(findBadge);
+    }
+
+    public Long count() {
+        Long num = (Long) em.createQuery("select count(b) from Badge b")
+                .getSingleResult();
+        return num;
     }
 }
