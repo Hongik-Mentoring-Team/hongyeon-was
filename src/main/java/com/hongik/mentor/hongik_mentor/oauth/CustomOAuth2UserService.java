@@ -43,7 +43,7 @@ public class CustomOAuth2UserService implements OAuth2UserService {
 
         //OAuthAttributes -> Member엔티티 변환 & DB 저장 또는 수정
         Member member = saveOrUpdate(oAuthAttributes, userNameAttributeName);
-        //2.
+    //2.
         //httpSession에 저장
         httpSession.setAttribute("sessionMember", new SessionMember(member));
 

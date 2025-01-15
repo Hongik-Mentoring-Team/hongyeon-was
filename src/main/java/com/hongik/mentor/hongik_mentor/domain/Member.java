@@ -75,11 +75,12 @@ public class Member {
         this.name = name;
         this.major = major;
         this.graduationYear = graduationYear;
-        if (graduationYear <= LocalDate.now().getYear()) {
+        /*if (graduationYear <= LocalDate.now().getYear()) {
             this.type = MemberType.GRADUATE;
         } else {
             this.type=MemberType.STUDENT;
-        }
+        }*/
+        this.type = MemberType.TEMP;
         this.accountStatus = AccountStatus.ACTIVE;
         this.role = Role.USER;
 

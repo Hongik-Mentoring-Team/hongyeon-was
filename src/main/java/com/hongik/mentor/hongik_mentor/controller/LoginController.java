@@ -28,7 +28,7 @@ public class LoginController {
         return "home";
     }
 
-    //회원 추가 정보 입력받기
+    /*회원 정보 추가 입력받기 & db저장*/
     @GetMapping("/member")
     public String createMember(@LoginMember SessionMember member) {
         if (member == null)
