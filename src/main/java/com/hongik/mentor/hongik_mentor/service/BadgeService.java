@@ -34,7 +34,7 @@ public class BadgeService {
 
     /*crud*/
     @Transactional
-    public Long save(Badge badge) {
+    public Long addBadge(Badge badge) {
         return badgeRepository.save(badge);
     }
 

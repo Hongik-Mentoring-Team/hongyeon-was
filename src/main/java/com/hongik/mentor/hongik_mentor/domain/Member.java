@@ -2,6 +2,7 @@ package com.hongik.mentor.hongik_mentor.domain;
 
 
 import com.hongik.mentor.hongik_mentor.domain.tier.Tier;
+import com.hongik.mentor.hongik_mentor.domain.tier.TierAssigner;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -37,8 +38,7 @@ import java.util.List;
 @Getter
 @Entity
 public class Member {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)     //참고(sequence, table전략은 JPA에서 ID를 미리 할당받기에 쿼리를 지연 가능, 반면 identity는 즉시 쿼리 발생)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)     //참고(sequence, table전략은 JPA에서 ID를 미리 할당받기에 쿼리를 지연 가능, 반면 identity는 즉시 쿼리 발생)
     @Column(name = "member_id")
     private Long id;    //DB용 PK
     @Column(nullable = false)
@@ -56,7 +56,7 @@ public class Member {
     @Column(nullable = false) @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberBadge> badges = new ArrayList<>();
     private String mainBadgeUrl;
 
@@ -85,7 +85,7 @@ public class Member {
         this.type = MemberType.TEMP;
         this.accountStatus = AccountStatus.ACTIVE;
         this.role = Role.USER;
-        this.tier = Tier.BRONZE;
+        this.tier = TierAssigner.evaluate(0L);
         this.rank = 0L;
     }
 

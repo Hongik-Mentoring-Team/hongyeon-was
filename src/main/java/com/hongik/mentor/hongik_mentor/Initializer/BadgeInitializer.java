@@ -17,8 +17,8 @@ public class BadgeInitializer {
             Badge badge1 = new Badge("badge1", "exampleUrl1");  //실제 이미지 파일 필요
             Badge badge2 = new Badge("badge2", "exampleUrl2");
 
-            badgeService.save(badge1);
-            badgeService.save(badge2);
+            badgeService.addBadge(badge1);
+            badgeService.addBadge(badge2);
         }
     }
 }

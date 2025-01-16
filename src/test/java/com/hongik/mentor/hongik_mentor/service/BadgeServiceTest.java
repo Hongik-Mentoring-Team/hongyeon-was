@@ -1,6 +1,5 @@
 package com.hongik.mentor.hongik_mentor.service;
 
-import com.hongik.mentor.hongik_mentor.controller.dto.MemberResponseDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.MemberSaveDto;
 import com.hongik.mentor.hongik_mentor.domain.Badge;
 import com.hongik.mentor.hongik_mentor.domain.Member;
@@ -31,8 +30,8 @@ public class BadgeServiceTest {
         Badge badge1 = new Badge("badge1", "1234");
         Badge badge2 = new Badge("badge2", "432");
 
-        Long id1 = badgeService.save(badge1);
-        Long id2 = badgeService.save(badge2);
+        Long id1 = badgeService.addBadge(badge1);
+        Long id2 = badgeService.addBadge(badge2);
 
         Badge findBadge1 = badgeService.findOne(id1);
         Badge findBadge2 = badgeService.findOne(id2);
@@ -46,8 +45,8 @@ public class BadgeServiceTest {
         Badge badge1 = new Badge("badge1", "1234");
         Badge badge2 = new Badge("badge2", "432");
 
-        Long id1 = badgeService.save(badge1);
-        Long id2 = badgeService.save(badge2);
+        Long id1 = badgeService.addBadge(badge1);
+        Long id2 = badgeService.addBadge(badge2);
 
         Member member1 = new Member("asdf", SocialProvider.GOOGLE, "olaf", "computer", 2012);
         memberRepository.save(member1);
