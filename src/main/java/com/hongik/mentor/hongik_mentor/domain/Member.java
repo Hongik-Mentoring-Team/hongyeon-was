@@ -6,7 +6,6 @@ import com.hongik.mentor.hongik_mentor.domain.tier.TierAssigner;
 import jakarta.persistence.*;
 import lombok.Getter;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +61,7 @@ public class Member {
 
     @Enumerated(EnumType.STRING)
     private Tier tier;
-    private Long rank;
+    private Long rank_value;
 
     private AccountStatus accountStatus; //null 주의
 
@@ -86,7 +85,7 @@ public class Member {
         this.accountStatus = AccountStatus.ACTIVE;
         this.role = Role.USER;
         this.tier = TierAssigner.evaluate(0L);
-        this.rank = 0L;
+        this.rank_value = 0L;
     }
 
     //TEMP(임시) member생성

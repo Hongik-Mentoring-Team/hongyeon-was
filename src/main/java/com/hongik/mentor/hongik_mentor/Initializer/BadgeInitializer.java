@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Component
+//@Component    //main어플리케이션 클래스에서 수동 빈 등록
 public class BadgeInitializer {
     private final BadgeService badgeService;
 

@@ -9,11 +9,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Repository
 public class BadgeRepository {
     @PersistenceContext
-    private final EntityManager em;
+    private EntityManager em;
 
     //create
     public Long save(Badge badge) {

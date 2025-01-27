@@ -35,7 +35,7 @@ public class MemberService {
     }
 
     /*재학생 인증*/
-    //1. 인증 코드 메일로 전송
+    //1. 메일로 인증코드  전송
     public boolean requestUnivEmailVerification(String userEmail){
         try {
             Map<String, Object> resp = UnivCert.certify("a718a7f1-5c62-4c2e-b007-bc8411926fe3", userEmail, "홍익대학교", true);
@@ -47,7 +47,7 @@ public class MemberService {
 
     }
 
-    //2. 인증 코드 검증
+    //2. 인증코드 검증
     public boolean confirmUnivEmailVerification(String userEmail, int verificationCode) {
         try {
             Map<String, Object> resp = UnivCert.certifyCode("a718a7f1-5c62-4c2e-b007-bc8411926fe3", userEmail, "홍익대학교", verificationCode);

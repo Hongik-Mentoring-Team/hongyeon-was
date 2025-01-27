@@ -16,10 +16,12 @@ public class ChatRoomMember {
     private ChatRoom chatRoom;
     private String nickname;
 
-    public ChatRoomMember(Member member, ChatRoom chatRoom) {
+    public ChatRoomMember(Member member, ChatRoom chatRoom, String nickname) {
         this.member = member;
-        this.chatRoom = chatRoom;
+        this.nickname = nickname;
     }
 
-
+    public void setChatRoom(ChatRoom chatRoom) {
+        this.chatRoom = chatRoom;
+    }
 }
