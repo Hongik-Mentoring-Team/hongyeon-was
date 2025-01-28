@@ -1,3 +1,4 @@
+univcertInfo.md
 HELP.md
 .gradle
 build/
@@ -37,3 +38,7 @@ out/
 .vscode/
 
 /src/main/resources/application-oauth.properties
+/src/test/resources/aaplicaiton.yml
+/src/main/resources/application-gno.yml
+/src/test/resources/application-gno.yml
+
