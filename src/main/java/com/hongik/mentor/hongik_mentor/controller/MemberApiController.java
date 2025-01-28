@@ -27,6 +27,7 @@ public class MemberApiController {
         return findMembers;
     }
 
+    //Member 단건 조회
     @GetMapping("/api/v1/members/{id}")
     public MemberResponseDto findMember(@PathVariable Long id) {
         return memberService.findById(id);

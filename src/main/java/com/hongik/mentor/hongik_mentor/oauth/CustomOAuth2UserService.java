@@ -43,14 +43,14 @@ public class CustomOAuth2UserService implements OAuth2UserService {
 
         //OAuthAttributes -> Member엔티티 변환 & DB 저장 또는 수정
         Member member = saveOrUpdate(oAuthAttributes, userNameAttributeName);
-        //2.
+    //2.
         //httpSession에 저장
         httpSession.setAttribute("sessionMember", new SessionMember(member));
 
     //3.
         //Oauth2User반환
         return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority(member.getRole().getKey())),
+                Collections.singleton(new SimpleGrantedAuthority(member.getRole().getKey())),   //Member 객체의 authority만 빼와서 Oauth2User에 저장
                 oAuthAttributes.getAttributes(),
                 oAuthAttributes.getNameAttributeKey()
         );
