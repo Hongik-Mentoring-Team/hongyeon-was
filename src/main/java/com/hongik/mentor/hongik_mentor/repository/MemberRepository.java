@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.NonUniqueResultException;
 import org.springframework.stereotype.Repository;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,8 +25,8 @@ public class MemberRepository {
     }
 
     //Read
-    public Member findById(Long id) {
-        return em.find(Member.class, id);
+    public Optional<Member> findById(Long id) {
+        return Optional.ofNullable(em.find(Member.class, id));
     }
 
     public List<Member> findAll() {     //Member가 없을 경우 빈 리스트 반환
@@ -45,15 +46,11 @@ public class MemberRepository {
     }
 
     public Optional<Member> findBySocialId(String userNameAttributeName) {
-        try{    //getSingleResult()는 조회 대상이 없을 경우 예외발생시킴
-            Optional<Member> findMember = em.createQuery("select m from Member m where m.socialId = :userNameAttributeName", Member.class)
-                    .setParameter("userNameAttributeName", userNameAttributeName)
-                    .getResultStream().findFirst(); //조회 결과: 1명 조회 | 0명 조회
-            return findMember;
-        } catch(NonUniqueResultException e){
-            return Optional.empty();    //빈 Optional 객체 생성 반환
-        }
-
+        //getSingleResult()는 조회 대상이 없을 경우 예외발생시킴
+        Optional<Member> findMember = em.createQuery("select m from Member m where m.socialId = :userNameAttributeName", Member.class)
+                .setParameter("userNameAttributeName", userNameAttributeName)
+                .getResultStream().findFirst(); //조회 결과: 1명 조회 | 0명 조회
+        return findMember;
 
     }
 }

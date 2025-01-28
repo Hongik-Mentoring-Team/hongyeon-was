@@ -1,0 +1,19 @@
+package com.hongik.mentor.hongik_mentor.exception;
+
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+/*
+* 책임 분리: 컨트롤러와 서비스에 예외 처리 로직을 최소화
+일관성: 모든 에러 응답이 동일한 구조로 반환되어 클라이언트가 쉽게 파싱하고 처리.
+유지보수성: 예외 처리 로직을 @ControllerAdvice에서 관리해 변경이 쉽고, 중복 코드 제거.
+* */
+@RestControllerAdvice   //예외를 전역적으로 처리
+public class GlobalExceptionHandler {
+    @ExceptionHandler(InitiateChatException.class)
+    public ResponseEntity<ErrorResponseEntity> handleInitiateChatException(InitiateChatException e, HttpServletRequest request) {
+        return ErrorResponseEntity.errorResponseEntity(e.getErrorCode());
+    }
+
+}

@@ -29,7 +29,7 @@ public class MemberService {
     @Transactional
     public void setMainBadge(Long badgeId, Long memberId) {
         Badge findBadge = badgeRepository.findById(badgeId);
-        Member findMember = memberRepository.findById(memberId);
+        Member findMember = memberRepository.findById(memberId).orElseThrow();
 
         findMember.setMainBadgeUrl(findBadge.getImageUrl());
     }
@@ -68,7 +68,7 @@ public class MemberService {
 
     //Read
     public MemberResponseDto findById(Long id) {
-        Member findMember = memberRepository.findById(id);
+        Member findMember = memberRepository.findById(id).orElseThrow();
 
         return new MemberResponseDto(findMember);
     }
@@ -87,7 +87,7 @@ public class MemberService {
 
     @Transactional
     public Long update(Long id, String name, String major, Integer graduationYear, MemberType memberType) {
-        Member findMember = memberRepository.findById(id);
+        Member findMember = memberRepository.findById(id).orElseThrow();
         return findMember.update(name, major, graduationYear, memberType);
     }
 

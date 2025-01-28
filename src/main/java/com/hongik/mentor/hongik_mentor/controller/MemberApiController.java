@@ -10,25 +10,26 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RequiredArgsConstructor
+@RequestMapping("/api/v1")
 @RestController
 public class MemberApiController {
     private final MemberService memberService;
 
     //Member 리소스 등록
-    @PostMapping("/api/v1/members")
+    @PostMapping("/members")
     public Long createMember(@RequestBody MemberSaveDto memberSaveDto) {
         return memberService.save(memberSaveDto);
     }
 
     //Member 리소스 조회
-    @GetMapping("/api/v1/members")
+    @GetMapping("/members")
     public List<MemberResponseDto> findMembers() {
         List<MemberResponseDto> findMembers = memberService.findAll();
         return findMembers;
     }
 
     //Member 단건 조회
-    @GetMapping("/api/v1/members/{id}")
+    @GetMapping("/members/{id}")
     public MemberResponseDto findMember(@PathVariable Long id) {
         return memberService.findById(id);
     }
@@ -39,13 +40,13 @@ public class MemberApiController {
 
 
     //Member 리소스 삭제
-    @DeleteMapping("/api/v1/members/{id}")
+    @DeleteMapping("/members/{id}")
     public void deleteMember(@PathVariable Long id) {
         memberService.delete(id);
     }
 
     //Member리소스 로그인
-    @PostMapping("/api/v1/login")
+    @PostMapping("/login")
     public void sendAuthorizationCode(/*@RequestBody ??? */) {
 
     }

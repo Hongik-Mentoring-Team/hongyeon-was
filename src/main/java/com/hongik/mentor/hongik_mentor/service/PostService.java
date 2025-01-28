@@ -108,7 +108,7 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
-        Member member = memberRepository.findById(memberId);
+        Member member = memberRepository.findById(memberId).orElseThrow();
 
         PostLike postLike = PostLike.builder()
                 .member(member)
