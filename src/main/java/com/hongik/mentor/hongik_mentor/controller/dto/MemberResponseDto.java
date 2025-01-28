@@ -32,5 +32,7 @@ public class MemberResponseDto {
 
     }
 
-
+    public Member toEntity() {
+        return new Member(socialId, socialProvider, name, major, graduationYear);
+    }
 }

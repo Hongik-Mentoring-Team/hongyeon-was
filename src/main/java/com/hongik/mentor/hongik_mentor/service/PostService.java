@@ -123,4 +123,41 @@ public class PostService {
 
     }
 
+    // 모집 지원 기능
+    @Transactional
+    public void applyToPost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
+
+        post.addApplicant();
+        postRepository.save(post);
+    }
+
+    // 모집 상태 초기화 기능
+    @Transactional
+    public void resetPostApplicants(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
+
+        post.resetApplicants();
+        postRepository.save(post);
+    }
+
+    // 모집 상태 확인 기능
+    public boolean isPostClosed(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
+
+        return post.isClosed();
+    }
+
+    // 신청 취소 기능
+    @Transactional
+    public void cancelApplication(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
+
+        post.cancelApplicant();
+        postRepository.save(post);
+    }
 }
