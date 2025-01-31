@@ -1,22 +1,31 @@
 package com.hongik.mentor.hongik_mentor.config;
 
 import com.hongik.mentor.hongik_mentor.constant.ConstantUri;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
+@RequiredArgsConstructor
 @EnableWebSocketMessageBroker
 @Configuration
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    private final StompChannelInterceptor stompChannelInterceptor;
+
     // 클라이언트가 메시지를 주고받을 엔드포인트(Handshake 용)
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // 예: "/ws-stomp" 라는 엔드포인트를 열고, 소켓연결 ,SockJS 사용 가능하도록
-        registry.addEndpoint("/ws-stomp")
-                .setAllowedOrigins(ConstantUri.FRONT_URL) //프론트서버 출처의 요청은 ok
-                .withSockJS();
+/*
+                registry.addEndpoint(ConstantUri.WS_ENDPOINT)
+                .setAllowedOrigins(ConstantUri.FRONT_URL); //프론트서버 출처의 요청은 ok
+*/
+        registry.addEndpoint(ConstantUri.WS_ENDPOINT)
+                .setAllowedOriginPatterns("*");
+//                .withSockJS()
     }
 
     @Override
@@ -28,5 +37,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         // 클라이언트가 메시지를 보낼 때 붙이는 prefix
         // 예: /app/... -> @MessageMapping으로 라우팅
-        registry.setApplicationDestinationPrefixes("/app");    }
+        registry.setApplicationDestinationPrefixes("/app");
+        //에러 메시지를 받을 사용자 대상 큐 설정
+        registry.setUserDestinationPrefix("/user");
+    }
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(stompChannelInterceptor);
+    }
 }

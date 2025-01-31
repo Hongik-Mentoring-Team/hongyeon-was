@@ -25,7 +25,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(ConstantUri.FRONT_URL) //허용할 외부 origin
+                .allowedOriginPatterns(ConstantUri.NEED_TO_CHAGE) //허용할 외부 origin
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*")
                 .allowCredentials(true);

@@ -1,9 +1,6 @@
 package com.hongik.mentor.hongik_mentor.service;
 
-import com.hongik.mentor.hongik_mentor.controller.dto.chat.ChatMessageDto;
-import com.hongik.mentor.hongik_mentor.controller.dto.chat.ChatMessageResponseDto;
-import com.hongik.mentor.hongik_mentor.controller.dto.chat.ChatRoomDto;
-import com.hongik.mentor.hongik_mentor.controller.dto.chat.ChatRoomResponseDto;
+import com.hongik.mentor.hongik_mentor.controller.dto.chat.*;
 import com.hongik.mentor.hongik_mentor.domain.Member;
 import com.hongik.mentor.hongik_mentor.domain.chat.ChatMessage;
 import com.hongik.mentor.hongik_mentor.domain.chat.ChatRoom;
@@ -67,7 +64,6 @@ public class ChatService {
         return new ChatRoomResponseDto(findChatRoom);
 
     }
-
     public List<ChatRoomResponseDto> findChatRoomByMemberId(Long memberId) {
         List<ChatRoom> chatRooms = chatRoomRepository.findByMemberId(memberId);
 
@@ -77,7 +73,6 @@ public class ChatService {
                 .collect(Collectors.toList());
 
     }
-
     //수정
     //삭제
     @Transactional
@@ -85,7 +80,9 @@ public class ChatService {
         chatRoomRepository.deleteById(chatRoomId);
         return chatRoomId;
     }
-    //ChatRoomMeber CRUD
+
+    //ChatRoomMember CRUD
+    //등록
     @Transactional
     public void saveChatRoomMembers(Long chatRoomId, Map<Long,String> chatMembers) {
         try {
@@ -104,5 +101,13 @@ public class ChatService {
     }
 
 
+    @Transactional
+    public Long initiateChat(ChatInitiateDto requestDto) {
+        String roomName = requestDto.getRoomName();
+        Long roomId = saveChatRoom(new ChatRoomDto(roomName));
+        saveChatRoomMembers(roomId, requestDto.getMembersInfo());
+
+        return roomId;
+    }
 
 }
