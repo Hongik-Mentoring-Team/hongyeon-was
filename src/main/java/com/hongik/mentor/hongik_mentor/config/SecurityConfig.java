@@ -55,8 +55,8 @@ public class SecurityConfig {
                 )
 
                 .oauth2Login(oauth2 -> oauth2   //소셜로그인 성공 시 처리
-                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-                        .successHandler(authenticationSuccessHandler));
+                        .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))    //Oauth2UserService 장착
+                        .successHandler(authenticationSuccessHandler));                                 //AuthenticationSuccessHandler 장착
         return httpSecurity.build();
 
     }

@@ -48,7 +48,7 @@ public class StompChannelInterceptor implements ChannelInterceptor {
             String sessionId = accessor.getSessionId();
             String user = accessor.getUser() != null ? accessor.getUser().getName() : "Unknown";
 
-            // 클라이언트의 메시지 전송 요청만 검증
+            // 클라이언트의 메시지 전송 요청만 검증 => messageBroker가 구독URL로 메시지를 브로드캐시팅할 때도, Interceptor가 가로채나? => Inbout/Outbound 따라 다름
             if (isClientSend(destination)) {
                 if (isMessageSendAllowed(destination, user)) {
                     System.out.println("User [" + user + "] with Session ID [" + sessionId + "] is allowed to send message to [" + destination + "]");

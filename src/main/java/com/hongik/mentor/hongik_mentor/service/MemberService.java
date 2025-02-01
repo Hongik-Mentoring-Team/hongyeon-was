@@ -5,6 +5,9 @@ import com.hongik.mentor.hongik_mentor.controller.dto.MemberSaveDto;
 import com.hongik.mentor.hongik_mentor.domain.Badge;
 import com.hongik.mentor.hongik_mentor.domain.Member;
 import com.hongik.mentor.hongik_mentor.domain.MemberType;
+import com.hongik.mentor.hongik_mentor.domain.SocialProvider;
+import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
+import com.hongik.mentor.hongik_mentor.exception.RegisterMemberException;
 import com.hongik.mentor.hongik_mentor.repository.BadgeRepository;
 import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
 import com.univcert.api.UnivCert;
@@ -63,7 +66,21 @@ public class MemberService {
     //Create
     @Transactional
     public Long save(MemberSaveDto memberSaveDto) {
+        //정합성 검증
+        if (isDuplicatedMember(memberSaveDto)) {
+            throw new RegisterMemberException(ErrorCode.DUPLICATE_MEMBER_REGISTER);
+        }
         return memberRepository.save(memberSaveDto.toEntity()).getId();
+    }
+
+    private boolean isDuplicatedMember(MemberSaveDto memberSaveDto) {
+        String socialId = memberSaveDto.getSocialId();
+        SocialProvider socialProvider = memberSaveDto.getSocialProvider();
+        Optional<Member> findMember = memberRepository.findBySocialId(socialId);
+        if (findMember.isPresent() && socialProvider.equals(findMember.get().getSocialProvider())) {
+            return true;
+        }
+        return false;
     }
 
     //Read

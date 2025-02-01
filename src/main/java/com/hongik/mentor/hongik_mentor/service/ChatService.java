@@ -84,11 +84,11 @@ public class ChatService {
     //ChatRoomMember CRUD
     //등록
     @Transactional
-    public void saveChatRoomMembers(Long chatRoomId, Map<Long,String> chatMembers) {
+    public void saveChatRoomMembers(Long chatRoomId, Map<Long,String> chatMembersInfo) {
         try {
             ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow();
 
-            chatMembers.forEach((id, nickname) -> {
+            chatMembersInfo.forEach((id, nickname) -> {
                 Member member = memberRepository.findById(id).orElseThrow();
                 ChatRoomMember chatRoomMember = new ChatRoomMember(member, chatRoom, nickname);
                 chatRoom.addChatMember(chatRoomMember);
@@ -100,12 +100,12 @@ public class ChatService {
 
     }
 
-
+    //초기 채팅방 생성
     @Transactional
     public Long initiateChat(ChatInitiateDto requestDto) {
         String roomName = requestDto.getRoomName();
-        Long roomId = saveChatRoom(new ChatRoomDto(roomName));
-        saveChatRoomMembers(roomId, requestDto.getMembersInfo());
+        Long roomId = this.saveChatRoom(new ChatRoomDto(roomName));
+        this.saveChatRoomMembers(roomId, requestDto.getMembersInfo());
 
         return roomId;
     }

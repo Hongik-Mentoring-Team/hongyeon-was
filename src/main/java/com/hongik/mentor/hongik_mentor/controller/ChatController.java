@@ -3,8 +3,11 @@ package com.hongik.mentor.hongik_mentor.controller;
 import com.hongik.mentor.hongik_mentor.constant.ConstantUri;
 import com.hongik.mentor.hongik_mentor.controller.dto.chat.ChatInitiateDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.chat.ChatMessageDto;
+import com.hongik.mentor.hongik_mentor.controller.dto.chat.ChatMessageResponseDto;
+import com.hongik.mentor.hongik_mentor.controller.dto.chat.ChatRoomResponseDto;
 import com.hongik.mentor.hongik_mentor.service.ChatService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -13,6 +16,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -33,7 +37,7 @@ public class ChatController {
         messagingTemplate.convertAndSend(ConstantUri.SUBSCRIBE_PREFIX + chatRoomId, messageDto);
     }
 
-    //채팅방 및 채팅 참여자 생성
+    //채팅방 및 채팅멤버 생성
     @PostMapping("/api/v1/chatRoom/initiate")
     public ResponseEntity<Map<String,Long>> initiateChat(@RequestBody ChatInitiateDto requestDto) {
         //create ChatRoom, ChatRoomMember at once
@@ -41,6 +45,14 @@ public class ChatController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Collections.singletonMap("chatRoomId", chatRoomId));
+    }
+
+    //채팅 메시지 내역 전달: 채팅방 url창을 새로 열때마다 호출
+    @GetMapping("/api/v1/chatRoom/history/{chatRoomId}")
+    public ResponseEntity<ChatRoomResponseDto> sendChatInfo(@PathVariable Long chatRoomId) {
+        ChatRoomResponseDto responseDto = chatService.findChatRoom(chatRoomId);
+        return ResponseEntity.ok()
+                .body(responseDto);
     }
 
 }
