@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @Repository
 public class MemberRepository {
+
     @PersistenceContext
     private EntityManager em;
 
