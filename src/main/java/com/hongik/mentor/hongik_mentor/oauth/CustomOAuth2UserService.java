@@ -2,6 +2,7 @@ package com.hongik.mentor.hongik_mentor.oauth;
 
 import com.hongik.mentor.hongik_mentor.controller.dto.MemberResponseDto;
 import com.hongik.mentor.hongik_mentor.domain.Member;
+import com.hongik.mentor.hongik_mentor.domain.SocialProvider;
 import com.hongik.mentor.hongik_mentor.oauth.dto.OAuthAttributes;
 import com.hongik.mentor.hongik_mentor.oauth.dto.SessionMember;
 import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
@@ -30,7 +31,7 @@ public class CustomOAuth2UserService implements OAuth2UserService {
     private final MemberRepository memberRepository;
     private final HttpSession httpSession;
 
-    //OAuth2User 반환
+    //Custom OAuth2User(principal) 반환
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate =new DefaultOAuth2UserService();
@@ -50,7 +51,7 @@ public class CustomOAuth2UserService implements OAuth2UserService {
         httpSession.setAttribute("sessionMember", new SessionMember(member));
 
     //3.
-        //Oauth2User반환
+        //Session(또는 Spring Context)에 Principal저장
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority(member.getRole().getKey())),   //Authority설정: 이후에 Authentication.authorities에 저장됨
                 oAuthAttributes.getAttributes(),
@@ -61,7 +62,8 @@ public class CustomOAuth2UserService implements OAuth2UserService {
     //Member가 이미 있다면 update, 없다면 save
     private Member saveOrUpdate(OAuthAttributes oAuthAttributes, String usernameAttributeName) {
         String socialId = oAuthAttributes.getSocialId();
-        Optional<Member> findOptionalMember = memberRepository.findBySocialId(socialId);
+        SocialProvider socialProvider = SocialProvider.from(oAuthAttributes.getRegistrationId());
+        Optional<Member> findOptionalMember = memberRepository.findBySocialId(socialId, socialProvider);
 
         //DB에 이미 Member있음
         if (findOptionalMember.isPresent()) {

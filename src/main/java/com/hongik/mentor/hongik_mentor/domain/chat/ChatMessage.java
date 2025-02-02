@@ -13,6 +13,7 @@ import java.util.EnumMap;
 @Entity
 public class ChatMessage {
     @Id @GeneratedValue
+    @Column(name = "chat_message_id")
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "chatroom_id", nullable = false)
     private ChatRoom chatRoom;

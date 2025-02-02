@@ -31,7 +31,7 @@ public class MemberApiController {
         sessionMember.update(memberRegisterDto.getName(),
                 memberRegisterDto.getMajor(),
                 memberRegisterDto.getGraduationYear());
-        log.info("세션멤버 업데이트 세션식별자: {}", httpSession.getId());
+        log.info("세션멤버 업데이트 완료. 세션ID: {}", httpSession.getId());
 
         MemberSaveDto memberSaveDto = new MemberSaveDto(sessionMember.getSocialId(),
                 sessionMember.getProvider(),

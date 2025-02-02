@@ -3,6 +3,7 @@ package com.hongik.mentor.hongik_mentor.repository;
 import com.hongik.mentor.hongik_mentor.controller.dto.MemberResponseDto;
 import com.hongik.mentor.hongik_mentor.domain.Member;
 import com.hongik.mentor.hongik_mentor.domain.MemberType;
+import com.hongik.mentor.hongik_mentor.domain.SocialProvider;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -45,10 +46,12 @@ public class MemberRepository {
                 .executeUpdate();//delete JPQL이라서 executeUpdate()필요
     }
 
-    public Optional<Member> findBySocialId(String userNameAttributeName) {
+    public Optional<Member> findBySocialId(String socialId, SocialProvider socialProvider) {
         //getSingleResult()는 조회 대상이 없을 경우 예외발생시킴
-        Optional<Member> findMember = em.createQuery("select m from Member m where m.socialId = :userNameAttributeName", Member.class)
-                .setParameter("userNameAttributeName", userNameAttributeName)
+        Optional<Member> findMember = em.createQuery("select m from Member m " +
+                        "where m.socialId = :socialId and m.socialProvider = :socialProvider", Member.class)
+                .setParameter("socialId", socialId)
+                .setParameter("socialProvider",socialProvider)
                 .getResultStream().findFirst(); //조회 결과: 1명 조회 | 0명 조회
         return findMember;
 

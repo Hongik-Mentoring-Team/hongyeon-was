@@ -21,13 +21,13 @@ public class WebConfig implements WebMvcConfigurer {
         resolvers.add(loginMemberArgumentResolver);
     }
 
-    //CORS 응답 헤더 설정
+    //MVC - CORS 응답 헤더 설정
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOriginPatterns(ConstantUri.NEED_TO_CHAGE) //허용할 외부 origin
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowedHeaders("*")
-                .allowCredentials(true);
+                .allowedHeaders(ConstantUri.NEED_TO_CHAGE)
+                .allowCredentials(true);        //인증수단(쿠키) 전송 허용
     }
 }

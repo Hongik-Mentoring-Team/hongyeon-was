@@ -76,8 +76,8 @@ public class MemberService {
     private boolean isDuplicatedMember(MemberSaveDto memberSaveDto) {
         String socialId = memberSaveDto.getSocialId();
         SocialProvider socialProvider = memberSaveDto.getSocialProvider();
-        Optional<Member> findMember = memberRepository.findBySocialId(socialId);
-        if (findMember.isPresent() && socialProvider.equals(findMember.get().getSocialProvider())) {
+        Optional<Member> findMember = memberRepository.findBySocialId(socialId, socialProvider);
+        if (findMember.isPresent()) {
             return true;
         }
         return false;
@@ -114,9 +114,9 @@ public class MemberService {
         memberRepository.delete(id);
     }
 
-    public Optional<MemberResponseDto> findBySocialId(String userNameAttributeName) {
+    public Optional<MemberResponseDto> findBySocialId(String socialId, SocialProvider socialProvider) {
         try {
-            MemberResponseDto memberResponseDto = new MemberResponseDto(memberRepository.findBySocialId(userNameAttributeName).get());
+            MemberResponseDto memberResponseDto = new MemberResponseDto(memberRepository.findBySocialId(socialId,socialProvider).get());
             return Optional.of(memberResponseDto);
         } catch (NoSuchElementException e) {
             return Optional.empty();

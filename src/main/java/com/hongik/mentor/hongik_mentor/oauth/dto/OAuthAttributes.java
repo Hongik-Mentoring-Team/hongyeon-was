@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -32,19 +33,21 @@ public class OAuthAttributes {
 
     //UserRequest -> OAuthAttributes 변환
     public static OAuthAttributes of(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
+        Map<String, Object> customAttributes = new HashMap<>(attributes);
         if ("naver".equals(registrationId)) {
-            return ofNaver("id", attributes, registrationId);   //기존의 userNameAttributeName: "response"이므로 -> "id"로 변경 필요
+            return ofNaver("id", customAttributes, registrationId);   //기존의 userNameAttributeName: "response"이므로 -> "id"로 변경 필요
         } else if ("google".equals(registrationId)) {
-            return ofGoogle(userNameAttributeName, attributes, registrationId);
+            return ofGoogle(userNameAttributeName, customAttributes, registrationId);
         } else
-            return ofKakao(userNameAttributeName, attributes, registrationId);
+            return ofKakao(userNameAttributeName, customAttributes, registrationId);
 
 
     }
 
     //kakao로그인용
     private static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes, String registrationId) {
-
+        //Authentication.attributes에 "socialProvider" 필드 추가
+        attributes.put("socialProvider", registrationId);
         //properties 접근
         Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
         String nickname = String.valueOf(properties.get("nickname"));
@@ -94,6 +97,8 @@ public class OAuthAttributes {
 
     //google로그인용
     public static OAuthAttributes ofGoogle(String userNameAttributeName, Map<String,Object> attributes, String registrationId) {
+        //Authentication.attributes에 "socialProvider" 필드 추가
+        attributes.put("socialProvider", registrationId);
         return OAuthAttributes.builder()
                 .attributes(attributes)
                 .email(String.valueOf(attributes.get("email")))
@@ -104,7 +109,7 @@ public class OAuthAttributes {
                 .socialId((String) attributes.get(userNameAttributeName))
                 .build();
 
-/*
+/* attributes형식
         {
             "sub": "110169484474386276334",         // 사용자의 고유 식별자 (소셜 아이디 역할)
                 "name": "John Doe",                      // 전체 이름
@@ -123,7 +128,8 @@ public class OAuthAttributes {
     //naver로그인용
     public static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes,String registrationId) {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-
+        //Authentication.attributes에 "socialProvider" 필드 추가
+        response.put("socialProvider", registrationId);
         return OAuthAttributes.builder()
                 .attributes(response)
                 .email(String.valueOf(response.get("email")))

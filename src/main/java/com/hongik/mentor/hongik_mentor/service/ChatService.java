@@ -71,7 +71,6 @@ public class ChatService {
                 .stream()
                 .map(chatRoom -> new ChatRoomResponseDto(chatRoom))
                 .collect(Collectors.toList());
-
     }
     //수정
     //삭제

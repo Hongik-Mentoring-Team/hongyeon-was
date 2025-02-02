@@ -1,44 +1,69 @@
 package com.hongik.mentor.hongik_mentor.config;
 
+import com.hongik.mentor.hongik_mentor.constant.ConstantUri;
+import com.hongik.mentor.hongik_mentor.controller.dto.MemberResponseDto;
+import com.hongik.mentor.hongik_mentor.controller.dto.chat.ChatMessageDto;
+import com.hongik.mentor.hongik_mentor.domain.SocialProvider;
+import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
+import com.hongik.mentor.hongik_mentor.exception.SendMessageException;
+import com.hongik.mentor.hongik_mentor.service.ChatService;
+import com.hongik.mentor.hongik_mentor.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Component;
 
+import java.security.Principal;
 import java.util.Collections;
 
 @Slf4j
 @Component
 public class StompChannelInterceptor implements ChannelInterceptor {
     private final SimpMessagingTemplate messagingTemplate;
-
+    private final MessageConverter messageConverter;
+    private final ChatService chatService;
+    private final MemberService memberService;
     @Autowired
-    public StompChannelInterceptor(@Lazy SimpMessagingTemplate messagingTemplate) {
+    public StompChannelInterceptor(@Lazy SimpMessagingTemplate messagingTemplate,
+                                   @Lazy MessageConverter messageConverter,
+                                   ChatService chatService,
+                                   MemberService memberService) {
         this.messagingTemplate = messagingTemplate;
+        this.messageConverter = messageConverter;
+        this.chatService = chatService;
+        this.memberService = memberService;
     }
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);   //WebSocket 메시지 헤더 접근
+        Principal principal = accessor.getUser();
+        /** 메시지 인증 인가
+         * */
+        //사용자 인증 검증: 웹소켓세션에 인증정보 없음
+        if(principal == null) throw new SendMessageException(ErrorCode.WEB_SOCKET_AUTHENTICATION_NOT_EXISTS);
 
         if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
             String destination = accessor.getDestination();
-            String sessionId = accessor.getSessionId();
-            String user = accessor.getUser() != null ? accessor.getUser().getName() : "Unknown";
+            String sessionId = accessor.getSessionId();                     //WebSocket 세션
+            String username = principal != null ? principal.getName() : "Unknown";
 
             // 구독 요청 검증 로직 추가
-            if (isSubscriptionAllowed(destination, user)) {
-                log.info("User {} with SessionId {} is allowed to subscribe to {}", user, sessionId, destination);
+            if (isSubscriptionAllowed(destination, principal)) {
+                log.info("User {} with SessionId {} is allowed to subscribe to {}", username, sessionId, destination);
                 // 구독 허용
             } else {
-                log.info("User {} with SessionId {} is NOT allowed to subscribe to {}", user, sessionId, destination);
+                log.info("User {} with SessionId {} is NOT allowed to subscribe to {}", username, sessionId, destination);
                 // 구독 거부
                 throw new IllegalArgumentException("Subscription to destination [" + destination + "] is not allowed.");
             }
@@ -49,19 +74,17 @@ public class StompChannelInterceptor implements ChannelInterceptor {
             String user = accessor.getUser() != null ? accessor.getUser().getName() : "Unknown";
 
             // 클라이언트의 메시지 전송 요청만 검증 => messageBroker가 구독URL로 메시지를 브로드캐시팅할 때도, Interceptor가 가로채나? => Inbout/Outbound 따라 다름
-            if (isClientSend(destination)) {
-                if (isMessageSendAllowed(destination, user)) {
-                    System.out.println("User [" + user + "] with Session ID [" + sessionId + "] is allowed to send message to [" + destination + "]");
-                    // 메시지 전송 허용
-                } else {
-                    System.out.println("User [" + user + "] with Session ID [" + sessionId + "] is NOT allowed to send message to [" + destination + "]");
-                    // 메시지 전송 거부
-                    messagingTemplate.convertAndSendToUser(user, "/queue/errors",
-                            Collections.singletonMap("message", "sending messages to destination " + destination + "is NOT allowed"));  //해당 에러url을 사용자가 구독해놨어야지 전송된다
-                    throw new IllegalArgumentException("Sending messages to destination [" + destination + "] is not allowed.");
-                }
+            if (isMessageSendAllowed(destination, principal, message)) {
+                log.info("socialId {} with SessionId {} is allowed to send message to {}", user, sessionId, destination);
+                // 메시지 전송 허용
+            } else {
+                // 메시지 전송 거부
+                log.info("socialId {} with SessionId {} is NOT allowed to send message to {}", user, sessionId, destination);
+                messagingTemplate.convertAndSendToUser(user, "/queue/errors",
+                        Collections.singletonMap("message", "sending messages to destination " + destination + "is NOT allowed"));  //해당 에러url을 사용자가 구독해놨어야지 전송된다
+                throw new IllegalArgumentException("Sending messages to destination [" + destination + "] is not allowed.");
             }
-            // 서버 측의 메시지 전송은 인터셉터에서 무시 (검증하지 않음)
+
         }
 
         return message;
@@ -71,52 +94,75 @@ public class StompChannelInterceptor implements ChannelInterceptor {
      * 구독 요청이 허용되는지 여부를 검증하는 메서드
      *
      * @param destination 구독 목적지
-     * @param user        사용자 이름
+     * @param principal   사용자 인증정보
      * @return 허용 여부
      */
-    private boolean isSubscriptionAllowed(String destination, String user) {
-        // 예시 조건:
-        // - 특정 채팅방만 구독 가능
-        // - 사용자 권한에 따라 구독 허용 여부 결정
+    private boolean isSubscriptionAllowed(String destination, Principal principal) {
+//        log.info("isSubscriptionAllowed -- pricipal형식: {}", principal);
+        if (destination == null || !destination.startsWith(ConstantUri.SUBSCRIBE_PREFIX)) return false;
 
-        // 여기서는 예시로 "/topic/chat/{roomId}" 형식의 목적지만 허용
-        if (destination != null && destination.startsWith("/topic/chat/")) {
-            // 추가적인 검증 로직을 여기에 추가할 수 있습니다.
-            return true;
-        }
+        //비회원
+        OAuth2AuthenticationToken authentication = (OAuth2AuthenticationToken) principal;
+        boolean notRegistered = authentication.getAuthorities()
+                .stream().anyMatch(ga -> ga.getAuthority().equals("ROLE_TEMP"));
+        if(notRegistered) return false;
 
-        return false;
+        //회원
+            //해당 채팅방 멤버인지 확인 => 성능개선  가능: principal에 memberId를 포함시킴
+        String socialId = authentication.getPrincipal().getName();
+        SocialProvider socialProvider = SocialProvider.from((String) authentication.getPrincipal().getAttributes().get("socialProvider") );
+
+        boolean isInChatroom = isInChatroom(destination, socialId, socialProvider);
+        if(!isInChatroom) return false;
+
+        return true;
     }
-
-    /**
-     * 메시지 전송 요청이 클라이언트로부터 온 것인지 확인하는 메서드
-     *
-     * @param destination 메시지를 전송할 목적지
-     * @return 클라이언트의 전송 요청 여부
-     */
-    private boolean isClientSend(String destination) {
-        // 클라이언트는 "/app/*" 경로로 메시지를 전송
-        return destination != null && destination.startsWith("/app/");
-    }
-
     /**
      * 메시지 전송 요청이 허용되는지 여부를 검증하는 메서드
      *
      * @param destination 메시지를 전송할 목적지
-     * @param user        사용자 이름
+     * @param principal        사용자 인증 정보
      * @return 허용 여부
      */
-    private boolean isMessageSendAllowed(String destination, String user) {
-        // 예시 조건:
-        // - "/app/chat/message" 경로로의 메시지 전송만 허용
-        // - 사용자 권한에 따라 메시지 전송 허용 여부 결정
+    private boolean isMessageSendAllowed(String destination, Principal principal, Message<?> message) {
+        //비회원
+        OAuth2AuthenticationToken authentication = (OAuth2AuthenticationToken) principal;
+        boolean notRegistered = authentication.getAuthorities()
+                .stream().anyMatch(ga -> ga.getAuthority().equals("ROLE_TEMP"));
+        if(notRegistered) return false;
 
-        // 여기서는 예시로 "/app/chat/message" 경로로의 메시지 전송만 허용
-        if (destination != null && destination.equals("/app/chat/message")) {
-            // 추가적인 검증 로직을 여기에 추가할 수 있습니다.
-            return true;
-        }
+        //회원
+        if (destination == null || !destination.equals(ConstantUri.STOMP_MESSAGE_URL)) return false;
+            //채팅방 멤버 검증
+        String socialId = authentication.getPrincipal().getName();
+        SocialProvider socialProvider = SocialProvider.from((String) authentication.getPrincipal().getAttributes().get("socialProvider") );
+        ChatMessageDto messageDto = (ChatMessageDto) messageConverter.fromMessage(message, ChatMessageDto.class);
 
-        return false;
+        if(!isInChatroom(messageDto, socialId, socialProvider)) return false;
+
+        return true;
+    }
+
+    /**
+     * 유저가 구독URL 채팅방에 포함되어 있는지 확인함
+     * @param destination 구독URL 또는 @Param messageDto
+     * @param socialId  소셜아이디
+     * @param socialProvider 구글,네이버..
+     *
+     * */
+    private boolean isInChatroom(String destination, String socialId, SocialProvider socialProvider) {
+        MemberResponseDto dto = memberService.findBySocialId(socialId, socialProvider).orElseThrow();
+
+        Long chatRoomId = Long.parseLong(destination.substring(ConstantUri.SUBSCRIBE_PREFIX.length()));
+        boolean isInChatroom = chatService.findChatRoomByMemberId(dto.getId())
+                .stream().anyMatch(chatRoomResponseDto -> chatRoomResponseDto.getId().equals(chatRoomId));
+        return isInChatroom;
+    }
+    private boolean isInChatroom(ChatMessageDto messageDto, String socialId, SocialProvider socialProvider) {
+        MemberResponseDto dto = memberService.findBySocialId(socialId, socialProvider).orElseThrow();
+        Long chatRoomId = messageDto.getChatRoomId();
+        boolean isInChatroom = chatService.findChatRoomByMemberId(dto.getId())
+                .stream().anyMatch(chatRoomResponseDto -> chatRoomResponseDto.getId().equals(chatRoomId));
+        return isInChatroom;
     }
 }

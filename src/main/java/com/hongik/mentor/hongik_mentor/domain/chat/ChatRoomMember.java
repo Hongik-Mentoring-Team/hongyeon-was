@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 public class ChatRoomMember {
     @Id @GeneratedValue
+    @Column(name = "chatroom_member_id")
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "member_id")
     private Member member;

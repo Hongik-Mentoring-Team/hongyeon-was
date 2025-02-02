@@ -1,5 +1,6 @@
 package com.hongik.mentor.hongik_mentor.config;
 
+import com.hongik.mentor.hongik_mentor.constant.ConstantUri;
 import com.hongik.mentor.hongik_mentor.domain.Role;
 import com.hongik.mentor.hongik_mentor.oauth.CustomAuthenticationSuccessHandler;
 import com.hongik.mentor.hongik_mentor.oauth.CustomOAuth2UserService;
@@ -8,6 +9,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Configuration
@@ -42,6 +47,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)throws Exception{
         httpSecurity
+                //Security - CORS 설정
+                .cors(cors->cors.configurationSource(CorsConfig.corsConfigurationSource()))
                 .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
                 .headers(httpSecurityHeadersConfigurer -> httpSecurityHeadersConfigurer.frameOptions(frameOptionsConfig -> frameOptionsConfig.disable()))
                 .authorizeHttpRequests(authorize -> authorize
@@ -51,6 +58,7 @@ public class SecurityConfig {
                 .logout(logout -> logout    //로그아웃 처리
                         .logoutSuccessUrl("/")
                         .logoutUrl("/logout")
+                        .permitAll()
                         .invalidateHttpSession(true)
                 )
 
