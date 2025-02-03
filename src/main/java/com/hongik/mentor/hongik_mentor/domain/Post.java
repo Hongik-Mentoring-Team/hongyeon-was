@@ -76,24 +76,40 @@ public class Post {
         this.tags.addAll(postTags);
     }
 
+    //신청자 멤버 리스트
+    @ManyToMany
+    @JoinTable(
+            name = "post_applicants",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "member_id")
+    )
+    @Builder.Default
+    private List<Member> applicants = new ArrayList<>();
+
 
     //신청자 추가
-    public void addApplicant() {
+    public void addApplicant(Member member) {
         if (isClosed) {
             throw new IllegalStateException("모집이 이미 마감되었습니다.");
         }
+        if (this.applicants.contains(member)) {
+            throw new IllegalStateException("이미 신청한 회원입니다.");
+        }
+
         this.currentApplicants++;
+        this.applicants.add(member);
         if (this.currentApplicants >= this.capacity) {
             this.isClosed = true;
         }
     }
 
     //신청 취소
-    public void cancelApplicant() {
-        if (currentApplicants <= 0) {
-            throw new IllegalStateException("신청자가 없습니다.");
+    public void cancelApplicant(Member member) {
+        if (!this.applicants.contains(member)) {
+            throw new IllegalStateException("신청한 적이 없는 회원입니다.");
         }
         this.currentApplicants--;
+        this.applicants.remove(member);
         if (this.isClosed) {
             this.isClosed = false;
         }
@@ -103,5 +119,6 @@ public class Post {
     public void resetApplicants() {
         this.currentApplicants = 0;
         this.isClosed = false;
+        this.applicants.clear();
     }
 }
