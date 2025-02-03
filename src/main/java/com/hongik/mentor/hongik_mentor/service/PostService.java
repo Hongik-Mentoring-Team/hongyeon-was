@@ -9,6 +9,7 @@ import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
 import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
 import com.hongik.mentor.hongik_mentor.repository.PostRepository;
 import com.hongik.mentor.hongik_mentor.repository.TagRepository;
+import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -131,7 +132,12 @@ public class PostService {
 
         Member member = memberRepository.findById(memberId);
 
-        post.addApplicant(member);
+        try {
+            post.addApplicant(member);
+        } catch (OptimisticLockException e) {
+            throw new RuntimeException("다시 시도해 주세요.");
+        }
+
         postRepository.save(post);
     }
 

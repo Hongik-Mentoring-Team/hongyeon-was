@@ -58,6 +58,10 @@ public class Post {
     @Builder.Default
     private boolean isClosed = false;
 
+    //Optimistic Locking
+    @Version
+    private Long version;
+
     public void addTags(PostTag tag){
         this.tags.add(tag);
     }
