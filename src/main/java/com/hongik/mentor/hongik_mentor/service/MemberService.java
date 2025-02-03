@@ -1,13 +1,19 @@
 package com.hongik.mentor.hongik_mentor.service;
 
+import com.hongik.mentor.hongik_mentor.controller.dto.FollowRequestDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.MemberResponseDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.MemberSaveDto;
+import com.hongik.mentor.hongik_mentor.domain.Follow;
 import com.hongik.mentor.hongik_mentor.domain.Badge;
 import com.hongik.mentor.hongik_mentor.domain.Member;
 import com.hongik.mentor.hongik_mentor.domain.MemberType;
+
 import com.hongik.mentor.hongik_mentor.domain.SocialProvider;
-import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
 import com.hongik.mentor.hongik_mentor.exception.RegisterMemberException;
+import com.hongik.mentor.hongik_mentor.exception.CustomMentorException;
+import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
+import com.hongik.mentor.hongik_mentor.repository.FollowRepository;
+
 import com.hongik.mentor.hongik_mentor.repository.BadgeRepository;
 import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
 import com.univcert.api.UnivCert;
@@ -28,6 +34,8 @@ import java.util.stream.Collectors;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final BadgeRepository badgeRepository;
+
+    private final FollowRepository followRepository;
 
     @Transactional
     public void setMainBadge(Long badgeId, Long memberId) {
@@ -121,5 +129,30 @@ public class MemberService {
         } catch (NoSuchElementException e) {
             return Optional.empty();
         }
+    }
+
+    @Transactional
+    public Long followMember(FollowRequestDTO followRequestDTO){ // followerId : 팔로우를 하려는 회원, followingId : 팔로우를 당하는 회원
+        Member follower = memberRepository.findById(followRequestDTO.getFollowerId());
+
+        Member following = memberRepository.findById(followRequestDTO.getFolloweeId());
+
+        Follow follow = Follow.builder()
+                .follower(follower)
+                .following(following)
+                .build();
+
+        followRepository.save(follow);
+
+        return follow.getId();
+    }
+
+    @Transactional
+    public void unfollowMember(FollowRequestDTO followRequestDTO){
+        Follow follow = followRepository.findByFollowerIdWithFollowingId(followRequestDTO.getFollowerId(),
+                        followRequestDTO.getFolloweeId())
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.FOLLOW_RELATIONSHIP_DOES_NOT_EXIST));
+
+        followRepository.delete(follow);
     }
 }

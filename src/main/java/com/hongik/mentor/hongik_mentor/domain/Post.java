@@ -35,9 +35,9 @@ public class Post {
     @CreatedDate
     private LocalDateTime createdAt;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "member_id")
-//    private Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -46,6 +46,17 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @Builder.Default
     private List<PostLike> likes = new ArrayList<>();
+
+    //모집인원
+    private int capacity;
+
+    //현재 신청자 수
+    @Builder.Default
+    private int currentApplicants = 0;
+
+    //모집 마감 여부
+    @Builder.Default
+    private boolean isClosed = false;
 
     public void addTags(PostTag tag){
         this.tags.add(tag);
@@ -65,4 +76,32 @@ public class Post {
         this.tags.addAll(postTags);
     }
 
+
+    //신청자 추가
+    public void addApplicant() {
+        if (isClosed) {
+            throw new IllegalStateException("모집이 이미 마감되었습니다.");
+        }
+        this.currentApplicants++;
+        if (this.currentApplicants >= this.capacity) {
+            this.isClosed = true;
+        }
+    }
+
+    //신청 취소
+    public void cancelApplicant() {
+        if (currentApplicants <= 0) {
+            throw new IllegalStateException("신청자가 없습니다.");
+        }
+        this.currentApplicants--;
+        if (this.isClosed) {
+            this.isClosed = false;
+        }
+    }
+
+    //모집 상태 초기화
+    public void resetApplicants() {
+        this.currentApplicants = 0;
+        this.isClosed = false;
+    }
 }

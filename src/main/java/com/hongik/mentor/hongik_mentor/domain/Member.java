@@ -5,8 +5,16 @@ import com.hongik.mentor.hongik_mentor.domain.tier.Tier;
 import com.hongik.mentor.hongik_mentor.domain.tier.TierAssigner;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.ArrayList;
+
 import java.util.List;
 
 //회원 엔티티
@@ -40,18 +48,34 @@ public class Member {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)     //참고(sequence, table전략은 JPA에서 ID를 미리 할당받기에 쿼리를 지연 가능, 반면 identity는 즉시 쿼리 발생)
     @Column(name = "member_id")
     private Long id;    //DB용 PK
+
     @Column(nullable = false)
     private String socialId;    //~userNameAttributeName              socialId+provider를 조합하여 유저를 구분함
+
     @Column(nullable = false) @Enumerated(EnumType.STRING)
     private SocialProvider socialProvider;  //~registrationId
+
     @Column(nullable = false)
     private String name;
+
     @Column(nullable = false)
     private String major;
+
     @Column(nullable = false)
     private Integer graduationYear;
+
     @Column(nullable = false) @Enumerated(EnumType.STRING)
     private MemberType type;    //재학생/졸업생
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Follow> following = new HashSet<>();
+
+    @OneToMany(mappedBy = "followers", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Follow> followers = new HashSet<>();
+
     @Column(nullable = false) @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -64,6 +88,14 @@ public class Member {
     private Long rank_value;
 
     private AccountStatus accountStatus; //생성시 자동주입
+
+    // 내가 작성한 리뷰
+    @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> writtenReviews = new ArrayList<>();
+
+    // 나에 대한 리뷰
+    @OneToMany(mappedBy = "target", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> receivedReviews = new ArrayList<>();
 
     public Member() {
     }
@@ -104,11 +136,24 @@ public class Member {
         return id;
     }
 
+
+    // 평균 평점 계산 메서드
+    public double getAverageRating() {
+        if (receivedReviews.isEmpty()) {
+            return 0.0;
+        }
+        return receivedReviews.stream()
+                .mapToInt(Review::getRating)
+                .average()
+                .orElse(0.0);
+    }
+
     public void addBadge(MemberBadge memberBadge) {
         this.badges.add(memberBadge);
     }
 
     public void setMainBadgeUrl(String url) {
         this.mainBadgeUrl=url;
+
     }
 }
