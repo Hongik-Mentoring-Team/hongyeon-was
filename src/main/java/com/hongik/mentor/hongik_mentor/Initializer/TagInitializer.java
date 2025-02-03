@@ -6,7 +6,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component    //main 어플리케이션 클래스에서 수동 빈 등록
 @RequiredArgsConstructor
 public class TagInitializer {
 
