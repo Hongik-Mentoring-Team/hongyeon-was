@@ -73,7 +73,7 @@ public class Member {
     private Set<Follow> followings = new HashSet<>();
 
     @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Follow> followerers = new HashSet<>();
+    private Set<Follow> followers = new HashSet<>();
 
     @Column(nullable = false) @Enumerated(EnumType.STRING)
     private Role role;
@@ -133,5 +133,13 @@ public class Member {
 
     public void setMainBadgeUrl(String url) {
         this.mainBadgeUrl=url;
+    }
+
+    public void addFollower(Follow follower) {
+        this.followers.add(follower);
+    }
+
+    public void addFollowing(Follow following) {
+        this.followings.add(following);
     }
 }

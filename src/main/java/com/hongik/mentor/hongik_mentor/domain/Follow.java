@@ -5,9 +5,7 @@ import lombok.*;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class Follow {
 
     @Id @GeneratedValue
@@ -22,6 +20,9 @@ public class Follow {
     @JoinColumn(name = "following_id")
     private Member following;
 
-
-
+    @Builder
+    public Follow(Member follower, Member following) {
+        this.follower = follower;
+        this.following = following;
+    }
 }

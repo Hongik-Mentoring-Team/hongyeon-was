@@ -117,12 +117,17 @@ public class MemberService {
     public Long followMember(FollowRequestDTO followRequestDTO){ // followerId : 팔로우를 하려는 회원, followingId : 팔로우를 당하는 회원
         Member follower = memberRepository.findById(followRequestDTO.getFollowerId());
 
-        Member following = memberRepository.findById(followRequestDTO.getFolloweeId());
+        Member followee = memberRepository.findById(followRequestDTO.getFolloweeId());
 
         Follow follow = Follow.builder()
                 .follower(follower)
-                .following(following)
+                .following(followee)
                 .build();
+
+        follower.addFollower(follow);
+
+        followee.addFollowing(follow);
+
 
         followRepository.save(follow);
 
@@ -130,11 +135,15 @@ public class MemberService {
     }
 
     @Transactional
-    public void unfollowMember(FollowRequestDTO followRequestDTO){
-        Follow follow = followRepository.findByFollowerIdWithFollowingId(followRequestDTO.getFollowerId(),
-                        followRequestDTO.getFolloweeId())
+    public void unfollowMember(Long followId){
+
+        Follow follow = followRepository.findById(followId)
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.FOLLOW_RELATIONSHIP_DOES_NOT_EXIST));
 
         followRepository.delete(follow);
+
+//        followRepository.deleteById(followId);
     }
+
+
 }

@@ -20,9 +20,9 @@ public class FollowController {
 
     }
 
-    @DeleteMapping("/api/unfollow")
-    public ResponseEntity<?> unfollowMember(@RequestBody FollowRequestDTO followRequestDTO){
-        memberService.unfollowMember(followRequestDTO);
+    @DeleteMapping("/api/unfollow/{followId}")
+    public ResponseEntity<?> unfollowMember(@PathVariable Long followId){
+        memberService.unfollowMember(followId);
 
         return ResponseEntity.noContent().build();
     }
