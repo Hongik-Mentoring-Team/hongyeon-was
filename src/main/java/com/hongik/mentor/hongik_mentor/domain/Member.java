@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.ArrayList;
+
 import java.util.List;
 
 //회원 엔티티
@@ -88,6 +89,14 @@ public class Member {
 
     private AccountStatus accountStatus; //null 주의
 
+    // 내가 작성한 리뷰
+    @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> writtenReviews = new ArrayList<>();
+
+    // 나에 대한 리뷰
+    @OneToMany(mappedBy = "target", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> receivedReviews = new ArrayList<>();
+
     public Member() {
     }
 
@@ -127,12 +136,25 @@ public class Member {
         return id;
     }
 
+
+    // 평균 평점 계산 메서드
+    public double getAverageRating() {
+        if (receivedReviews.isEmpty()) {
+            return 0.0;
+        }
+        return receivedReviews.stream()
+                .mapToInt(Review::getRating)
+                .average()
+                .orElse(0.0);
+    }
+
     public void addBadge(MemberBadge memberBadge) {
         this.badges.add(memberBadge);
     }
 
     public void setMainBadgeUrl(String url) {
         this.mainBadgeUrl=url;
+
     }
 
     public void addFollower(Follow follower) {
