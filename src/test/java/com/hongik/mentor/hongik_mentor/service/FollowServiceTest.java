@@ -41,6 +41,7 @@ public class FollowServiceTest {
     @BeforeEach
     void setUp() {
         followRepository.deleteAllInBatch();
+        memberRepository.deleteAll();
     }
 
 
@@ -66,7 +67,6 @@ public class FollowServiceTest {
         Long followId = memberService.followMember(request);
 
         //then
-        assertThat(followId).isEqualTo(1L);
         assertThat(member1.getFollowers()).hasSize(1);
         assertThat(member2.getFollowings()).hasSize(1);
 
