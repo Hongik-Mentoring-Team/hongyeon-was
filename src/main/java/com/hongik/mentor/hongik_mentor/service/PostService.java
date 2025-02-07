@@ -9,6 +9,7 @@ import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
 import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
 import com.hongik.mentor.hongik_mentor.repository.PostRepository;
 import com.hongik.mentor.hongik_mentor.repository.TagRepository;
+import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,23 +30,19 @@ public class PostService {
     @Transactional
     public Long createPost(PostCreateDTO postCreateDTO) {
 
-//        Member member = memberRepository.findById(postCreateDTO.getMemberId());
+        Member member = memberRepository.findById(postCreateDTO.getMemberId());
 
         Post post = Post.builder()
-//                .member(member)
+                .member(member)
                 .title(postCreateDTO.getTitle())
                 .content(postCreateDTO.getContent())
                 .build();
 
 
-        postCreateDTO.getTagId().stream()
+        postCreateDTO.getTagId()
                 .forEach(id -> {
                     Tag tag = tagRepository.findById(id).orElseThrow(() -> new RuntimeException("Tag not found"));
-                    PostTag postTag = PostTag.builder()
-                            .tag(tag)
-                            .post(post)
-                            .build();
-
+                    PostTag postTag = PostTag.of(tag, post);
                     post.addTags(postTag);
                 });
 
@@ -63,9 +60,9 @@ public class PostService {
     }
 
     @Transactional
-    public Long modifyPost(PostModifyDTO postModifyDTO) {
+    public Long modifyPost(Long postId, PostModifyDTO postModifyDTO) {
 
-        Post post = postRepository.getPostById(postModifyDTO.getPostId())
+        Post post = postRepository.getPostById(postId)
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
 
         List<Tag> tags = postModifyDTO.getTagIds().stream()
@@ -104,6 +101,7 @@ public class PostService {
                 .map(PostDTO::fromPost).toList();
     }
 
+    @Transactional
     public Long thumbUp(Long postId, Long memberId) { // 좋아요 기능
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
@@ -123,4 +121,49 @@ public class PostService {
 
     }
 
+    // 모집 지원 기능
+    @Transactional
+    public void applyToPost(Long postId, Long memberId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
+
+        Member member = memberRepository.findById(memberId);
+
+        try {
+            post.addApplicant(member);
+        } catch (OptimisticLockException e) {
+            throw new RuntimeException("다시 시도해 주세요.");
+        }
+
+        postRepository.save(post);
+    }
+
+    // 모집 상태 초기화 기능
+    @Transactional
+    public void resetPostApplicants(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
+
+        post.resetApplicants();
+        postRepository.save(post);
+    }
+
+    // 모집 상태 확인 기능
+    public boolean isPostClosed(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
+        return post.isClosed();
+    }
+
+    // 신청 취소 기능
+    @Transactional
+    public void cancelApplication(Long postId, Long memberId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
+
+        Member member = memberRepository.findById(memberId);
+
+        post.cancelApplicant(member);
+        postRepository.save(post);
+    }
 }
