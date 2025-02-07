@@ -7,9 +7,13 @@ import com.hongik.mentor.hongik_mentor.domain.Follow;
 import com.hongik.mentor.hongik_mentor.domain.Badge;
 import com.hongik.mentor.hongik_mentor.domain.Member;
 import com.hongik.mentor.hongik_mentor.domain.MemberType;
+
+import com.hongik.mentor.hongik_mentor.domain.SocialProvider;
+import com.hongik.mentor.hongik_mentor.exception.RegisterMemberException;
 import com.hongik.mentor.hongik_mentor.exception.CustomMentorException;
 import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
 import com.hongik.mentor.hongik_mentor.repository.FollowRepository;
+
 import com.hongik.mentor.hongik_mentor.repository.BadgeRepository;
 import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
 import com.univcert.api.UnivCert;
@@ -36,7 +40,7 @@ public class MemberService {
     @Transactional
     public void setMainBadge(Long badgeId, Long memberId) {
         Badge findBadge = badgeRepository.findById(badgeId);
-        Member findMember = memberRepository.findById(memberId);
+        Member findMember = memberRepository.findById(memberId).orElseThrow();
 
         findMember.setMainBadgeUrl(findBadge.getImageUrl());
     }
@@ -70,12 +74,26 @@ public class MemberService {
     //Create
     @Transactional
     public Long save(MemberSaveDto memberSaveDto) {
+        //정합성 검증
+        if (isDuplicatedMember(memberSaveDto)) {
+            throw new RegisterMemberException(ErrorCode.DUPLICATE_MEMBER_REGISTER);
+        }
         return memberRepository.save(memberSaveDto.toEntity()).getId();
+    }
+
+    private boolean isDuplicatedMember(MemberSaveDto memberSaveDto) {
+        String socialId = memberSaveDto.getSocialId();
+        SocialProvider socialProvider = memberSaveDto.getSocialProvider();
+        Optional<Member> findMember = memberRepository.findBySocialId(socialId, socialProvider);
+        if (findMember.isPresent()) {
+            return true;
+        }
+        return false;
     }
 
     //Read
     public MemberResponseDto findById(Long id) {
-        Member findMember = memberRepository.findById(id);
+        Member findMember = memberRepository.findById(id).orElseThrow();
 
         return new MemberResponseDto(findMember);
     }
@@ -94,7 +112,7 @@ public class MemberService {
 
     @Transactional
     public Long update(Long id, String name, String major, Integer graduationYear, MemberType memberType) {
-        Member findMember = memberRepository.findById(id);
+        Member findMember = memberRepository.findById(id).orElseThrow();
         return findMember.update(name, major, graduationYear, memberType);
     }
 
@@ -104,9 +122,9 @@ public class MemberService {
         memberRepository.delete(id);
     }
 
-    public Optional<MemberResponseDto> findBySocialId(String userNameAttributeName) {
+    public Optional<MemberResponseDto> findBySocialId(String socialId, SocialProvider socialProvider) {
         try {
-            MemberResponseDto memberResponseDto = new MemberResponseDto(memberRepository.findBySocialId(userNameAttributeName).get());
+            MemberResponseDto memberResponseDto = new MemberResponseDto(memberRepository.findBySocialId(socialId,socialProvider).get());
             return Optional.of(memberResponseDto);
         } catch (NoSuchElementException e) {
             return Optional.empty();

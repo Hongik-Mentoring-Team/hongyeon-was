@@ -14,7 +14,6 @@ import java.util.List;
 public class ChatRoomDto {
 
     private String name;    //채팅방 이름
-    private ChatRoomStatus roomStatus;
 
     public ChatRoomDto(String name) {
         this.name = name;

@@ -24,7 +24,7 @@ public class BadgeService {
     @Transactional
     public void giveBadgeToMember(Long badgeId, Long memberId) {
         Badge findBadge = badgeRepository.findById(badgeId);
-        Member findMember = memberRepository.findById(memberId);
+        Member findMember = memberRepository.findById(memberId).orElseThrow();
 
         MemberBadge memberBadge = new MemberBadge(findMember, findBadge);
         badgeRepository.saveMemberBadge(memberBadge);

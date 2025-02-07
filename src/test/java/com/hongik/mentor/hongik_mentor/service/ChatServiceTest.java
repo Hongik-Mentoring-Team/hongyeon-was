@@ -2,6 +2,7 @@ package com.hongik.mentor.hongik_mentor.service;
 
 import com.hongik.mentor.hongik_mentor.controller.dto.MemberSaveDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.chat.ChatMessageDto;
+import com.hongik.mentor.hongik_mentor.controller.dto.chat.ChatMessageResponseDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.chat.ChatRoomDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.chat.ChatRoomResponseDto;
 import com.hongik.mentor.hongik_mentor.domain.SocialProvider;
@@ -16,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
@@ -32,11 +34,13 @@ class ChatServiceTest {
     MemberRepository memberRepository;
     @Test
     void 채팅방_생성_테스트() {
+        /*given*/
+
+        //Member생성
         Long member1Id = memberService.save(new MemberSaveDto("1", SocialProvider.GOOGLE, "olaf", "CS", 2025));
         Long member2Id = memberService.save(new MemberSaveDto("2", SocialProvider.GOOGLE, "tryn", "EC", 2025));
 
-        //when
-        //user input: 채팅방 참여자 목록
+        /*when*/
         Long roomId = chatService.saveChatRoom(new ChatRoomDto("roomA"));
         log.info("chatroom id={}", roomId);
 
@@ -46,17 +50,38 @@ class ChatServiceTest {
 
         chatService.saveChatRoomMembers(roomId, chatMembersInfo);
 
-        ChatRoomResponseDto findRoom = chatService.findChatRoom(roomId);
 
         //then
-        ChatRoomResponseDto chatRoom = chatService.findChatRoom(roomId);
-        assertThat(chatRoom.getName()).isEqualTo("roomA");
-        assertThat(chatRoom.getChatMembers()).hasSize(2);
+        ChatRoomResponseDto findChatRoom = chatService.findChatRoom(roomId);
+        assertThat(findChatRoom.getName()).isEqualTo("roomA");
+        assertThat(findChatRoom.getChatMembers()).hasSize(2);
 
     }
 
     @Test
     void 메시지_저장_테스트() {
+        //Member생성 저장
+        Long member1Id = memberService.save(new MemberSaveDto("1", SocialProvider.GOOGLE, "olaf", "CS", 2025));
+        Long member2Id = memberService.save(new MemberSaveDto("2", SocialProvider.GOOGLE, "tryn", "EC", 2025));
+        //Chatroom 생성 저장
+        Long roomId = chatService.saveChatRoom(new ChatRoomDto("roomA"));
+        //ChatMember 생성 저장
+        Map<Long, String> chatMembersInfo = new HashMap<>();
+        String nickname1 = "olafN";
+        chatMembersInfo.put(member1Id, nickname1);
+        String nickname2 = "trynN";
+        chatMembersInfo.put(member2Id, nickname2);
+        chatService.saveChatRoomMembers(roomId, chatMembersInfo);
+
+        /*when*/
+        String content = "나의 첫 메시지다!";
+        chatService.saveChatMessage(roomId, new ChatMessageDto(roomId, nickname1, member1Id, content));
+
+        //then
+        List<ChatMessageResponseDto> messages = chatService.findMessages(roomId);
+        assertThat(messages.get(0).getContent()).isEqualTo(content);
+        log.info("message: {}", messages.get(0).getContent());
 
     }
+
 }

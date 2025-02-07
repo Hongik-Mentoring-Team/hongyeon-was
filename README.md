@@ -60,3 +60,4 @@
 - **[chore]** 프로젝트 설정 작업
 - **[meta]** 프로젝트 관련 논의
 - **[dependencies]** 종속성 업데이트
+- **[environment]** 개발 환경 논의

@@ -3,12 +3,14 @@ package com.hongik.mentor.hongik_mentor.repository;
 import com.hongik.mentor.hongik_mentor.controller.dto.MemberResponseDto;
 import com.hongik.mentor.hongik_mentor.domain.Member;
 import com.hongik.mentor.hongik_mentor.domain.MemberType;
+import com.hongik.mentor.hongik_mentor.domain.SocialProvider;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.NonUniqueResultException;
 import org.springframework.stereotype.Repository;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,8 +27,8 @@ public class MemberRepository {
     }
 
     //Read
-    public Member findById(Long id) {
-        return em.find(Member.class, id);
+    public Optional<Member> findById(Long id) {
+        return Optional.ofNullable(em.find(Member.class, id));
     }
 
     public List<Member> findAll() {     //Member가 없을 경우 빈 리스트 반환
@@ -45,16 +47,14 @@ public class MemberRepository {
                 .executeUpdate();//delete JPQL이라서 executeUpdate()필요
     }
 
-    public Optional<Member> findBySocialId(String userNameAttributeName) {
-        try{    //getSingleResult()는 조회 대상이 없을 경우 예외발생시킴
-            Optional<Member> findMember = em.createQuery("select m from Member m where m.socialId = :userNameAttributeName", Member.class)
-                    .setParameter("userNameAttributeName", userNameAttributeName)
-                    .getResultStream().findFirst(); //조회 결과: 1명 조회 | 0명 조회
-            return findMember;
-        } catch(NonUniqueResultException e){
-            return Optional.empty();    //빈 Optional 객체 생성 반환
-        }
-
+    public Optional<Member> findBySocialId(String socialId, SocialProvider socialProvider) {
+        //getSingleResult()는 조회 대상이 없을 경우 예외발생시킴
+        Optional<Member> findMember = em.createQuery("select m from Member m " +
+                        "where m.socialId = :socialId and m.socialProvider = :socialProvider", Member.class)
+                .setParameter("socialId", socialId)
+                .setParameter("socialProvider",socialProvider)
+                .getResultStream().findFirst(); //조회 결과: 1명 조회 | 0명 조회
+        return findMember;
 
     }
 }

@@ -1,14 +1,8 @@
 package com.hongik.mentor.hongik_mentor.controller.dto.chat;
 
 import com.hongik.mentor.hongik_mentor.domain.chat.ChatRoom;
-import com.hongik.mentor.hongik_mentor.domain.chat.ChatRoomMember;
 import com.hongik.mentor.hongik_mentor.domain.chat.ChatRoomStatus;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.OneToMany;
 import lombok.Data;
-import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +12,8 @@ import java.util.stream.Collectors;
 public class ChatRoomResponseDto {
         private Long id;
         private String name;    //채팅방 이름
-        private List<ChatRoomMemberDto> chatMembers = new ArrayList<>();
+        private List<ChatRoomMemberResponseDto> chatMembers = new ArrayList<>();
+        private List<ChatMessageResponseDto> chatMessages = new ArrayList<>();
         private ChatRoomStatus roomStatus;
 
         public ChatRoomResponseDto(ChatRoom chatRoom) {
@@ -27,7 +22,11 @@ public class ChatRoomResponseDto {
                 this.roomStatus = chatRoom.getRoomStatus();
                 this.chatMembers = chatRoom.getChatMembers()
                         .stream()
-                        .map(chatRoomMember -> new ChatRoomMemberDto(chatRoomMember))
+                        .map(chatRoomMember -> new ChatRoomMemberResponseDto(chatRoomMember))
+                        .collect(Collectors.toList());
+                this.chatMessages = chatRoom.getChatMessages()
+                        .stream()
+                        .map(chatMessage -> new ChatMessageResponseDto(chatMessage))
                         .collect(Collectors.toList());
 
         }

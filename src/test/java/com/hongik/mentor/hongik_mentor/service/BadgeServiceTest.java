@@ -63,7 +63,7 @@ public class BadgeServiceTest {
         Member member1 = new Member("asdf", SocialProvider.GOOGLE, "olaf", "computer", 2012);
 
         Long memberId = memberService.save(new MemberSaveDto(member1.getSocialId(), member1.getSocialProvider(), member1.getName(), member1.getMajor(), member1.getGraduationYear()));
-        Member findMember = memberRepository.findById(memberId);
+        Member findMember = memberRepository.findById(memberId).orElseThrow();
         findMember.addBadge(new MemberBadge(findMember,badge1));
 
         Assertions.assertThat(findMember.getBadges().size()).isEqualTo(1);
