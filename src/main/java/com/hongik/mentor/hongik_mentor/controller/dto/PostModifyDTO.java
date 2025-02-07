@@ -11,8 +11,6 @@ import java.util.List;
 public class PostModifyDTO {
 
 
-    private Long postId;
-
     private String title;
 
     private String content;

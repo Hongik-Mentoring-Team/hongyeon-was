@@ -70,10 +70,10 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Follow> following = new HashSet<>();
+    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Follow> followings = new HashSet<>();
 
-    @OneToMany(mappedBy = "followers", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Follow> followers = new HashSet<>();
 
     @Column(nullable = false) @Enumerated(EnumType.STRING)
@@ -155,5 +155,13 @@ public class Member {
     public void setMainBadgeUrl(String url) {
         this.mainBadgeUrl=url;
 
+    }
+
+    public void addFollower(Follow follower) {
+        this.followers.add(follower);
+    }
+
+    public void addFollowing(Follow following) {
+        this.followings.add(following);
     }
 }

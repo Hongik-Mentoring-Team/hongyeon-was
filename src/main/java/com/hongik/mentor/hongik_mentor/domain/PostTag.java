@@ -5,8 +5,6 @@ import lombok.*;
 
 @Entity
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostTag {
 
@@ -22,4 +20,16 @@ public class PostTag {
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @Builder
+    public PostTag(Tag tag, Post post) {
+        this.tag = tag;
+        this.post = post;
+    }
+
+    public static PostTag of(Tag tag, Post post) {
+        return PostTag.builder()
+                .tag(tag)
+                .post(post)
+                .build();
+    }
 }
