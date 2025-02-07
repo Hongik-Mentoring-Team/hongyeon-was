@@ -110,8 +110,8 @@ public class MemberService {
 
     //Delete
     @Transactional
-    public void delete(Long id) {
-        memberRepository.delete(id);
+    public void delete(Long memberId) {
+        memberRepository.delete(memberId);
     }
 
     public Optional<MemberResponseDto> findBySocialId(String socialId, SocialProvider socialProvider) {

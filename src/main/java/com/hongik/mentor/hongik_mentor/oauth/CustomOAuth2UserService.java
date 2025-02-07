@@ -48,7 +48,7 @@ public class CustomOAuth2UserService implements OAuth2UserService {
         Member member = saveOrUpdate(oAuthAttributes, userNameAttributeName);
     //2.
         //httpSession에 저장
-        httpSession.setAttribute("sessionMember", new SessionMember(member));
+        httpSession.setAttribute("sessionMember", new SessionMember(member,(String)oAuthAttributes.getAttributes().get("name")));
 
     //3.
         //Session(또는 Spring Context)에 Principal저장

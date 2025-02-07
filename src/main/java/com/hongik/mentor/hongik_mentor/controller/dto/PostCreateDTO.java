@@ -17,6 +17,6 @@ public class PostCreateDTO {
 
     private List<Long> tagId;
 
-    private Long memberId;
+//    private Long memberId; => 게시글 생성시 접속 세션에서 Id조회
 
 }

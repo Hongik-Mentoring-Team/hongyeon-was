@@ -81,6 +81,7 @@ public class Member {
         } else {
             this.type=MemberType.STUDENT;
         }*/
+        this.mainBadgeUrl = "";
         this.type = MemberType.TEMP;
         this.accountStatus = AccountStatus.ACTIVE;
         this.role = Role.USER;

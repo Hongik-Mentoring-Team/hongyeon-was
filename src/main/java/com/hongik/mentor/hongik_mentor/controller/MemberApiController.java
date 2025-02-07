@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -58,21 +59,23 @@ public class MemberApiController {
         return sessionMember;
     }
 
+    @GetMapping("/members/me")
+    public MemberResponseDto getMemberProfile(@LoginMember SessionMember sessionMember) {
+        MemberResponseDto dto = memberService.findById(sessionMember.getId());
+        return dto;
+    }
+
 /*  //Member 리소스 수정
     =>필요시 구현
 * */
 
 
     //Member 리소스 삭제
-    @DeleteMapping("/members/{id}")
-    public void deleteMember(@PathVariable Long id) {
-        memberService.delete(id);
+    @DeleteMapping("/members/me")
+    public void deleteMember(@LoginMember SessionMember sessionMember) {
+        memberService.delete(sessionMember.getId());
     }
 
-    //Member리소스 로그인
-    @PostMapping("/login")
-    public void sendAuthorizationCode(/*@RequestBody ??? */) {
 
-    }
 
 }
