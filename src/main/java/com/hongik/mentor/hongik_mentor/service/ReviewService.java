@@ -1,9 +1,11 @@
 package com.hongik.mentor.hongik_mentor.service;
 
+import com.hongik.mentor.hongik_mentor.controller.dto.MemberResponseDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.ReviewResponseDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.ReviewSaveDto;
 import com.hongik.mentor.hongik_mentor.domain.Member;
 import com.hongik.mentor.hongik_mentor.domain.Review;
+import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
 import com.hongik.mentor.hongik_mentor.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,14 +19,14 @@ import java.util.stream.Collectors;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final MemberService memberService;
+    private final MemberRepository memberRepository;
 
     //저장
     @Transactional
     public ReviewResponseDto save(ReviewSaveDto reviewSaveDto) {
 
-        Member writer = memberService.findById(reviewSaveDto.getWriterId()).toEntity();
-        Member target = memberService.findById(reviewSaveDto.getTargetId()).toEntity();
+        Member writer = memberRepository.findById(reviewSaveDto.getWriterId()).orElseThrow();
+        Member target = memberRepository.findById(reviewSaveDto.getTargetId()).orElseThrow();
 
         Review review = reviewSaveDto.toEntity(
                 reviewSaveDto.getContent(),

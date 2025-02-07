@@ -4,6 +4,7 @@ import com.hongik.mentor.hongik_mentor.controller.dto.PostCreateDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostModifyDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.SearchByTagDto;
+import com.hongik.mentor.hongik_mentor.oauth.util.SessionUtil;
 import com.hongik.mentor.hongik_mentor.service.PostService;
 import com.hongik.mentor.hongik_mentor.service.dto.PostLikeDTO;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +18,12 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
+    private final SessionUtil sessionUtil;
 
     @PostMapping("/api/post")
     public ResponseEntity<?> createPost(@RequestBody PostCreateDTO postCreateDTO) {
-
-        Long postId = postService.createPost(postCreateDTO);
+        Long memberId = sessionUtil.getCurrentMemberId();
+        Long postId = postService.createPost(postCreateDTO, memberId);
 
         return ResponseEntity.status(201).body(postId);
     }

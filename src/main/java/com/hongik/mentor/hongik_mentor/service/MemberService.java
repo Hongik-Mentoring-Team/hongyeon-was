@@ -1,6 +1,7 @@
 package com.hongik.mentor.hongik_mentor.service;
 
 import com.hongik.mentor.hongik_mentor.controller.dto.FollowRequestDTO;
+import com.hongik.mentor.hongik_mentor.controller.dto.MemberAdminDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.MemberResponseDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.MemberSaveDto;
 import com.hongik.mentor.hongik_mentor.domain.Follow;
@@ -122,10 +123,10 @@ public class MemberService {
         memberRepository.delete(memberId);
     }
 
-    public Optional<MemberResponseDto> findBySocialId(String socialId, SocialProvider socialProvider) {
+    public Optional<MemberAdminDto> findBySocialId(String socialId, SocialProvider socialProvider) {
         try {
-            MemberResponseDto memberResponseDto = new MemberResponseDto(memberRepository.findBySocialId(socialId,socialProvider).get());
-            return Optional.of(memberResponseDto);
+            MemberAdminDto dto = new MemberAdminDto(memberRepository.findBySocialId(socialId, socialProvider).get());
+            return Optional.of(dto);
         } catch (NoSuchElementException e) {
             return Optional.empty();
         }
@@ -133,9 +134,9 @@ public class MemberService {
 
     @Transactional
     public Long followMember(FollowRequestDTO followRequestDTO){ // followerId : 팔로우를 하려는 회원, followingId : 팔로우를 당하는 회원
-        Member follower = memberRepository.findById(followRequestDTO.getFollowerId());
+        Member follower = memberRepository.findById(followRequestDTO.getFollowerId()).orElseThrow();
 
-        Member followee = memberRepository.findById(followRequestDTO.getFolloweeId());
+        Member followee = memberRepository.findById(followRequestDTO.getFolloweeId()).orElseThrow();
 
         Follow follow = Follow.builder()
                 .follower(follower)

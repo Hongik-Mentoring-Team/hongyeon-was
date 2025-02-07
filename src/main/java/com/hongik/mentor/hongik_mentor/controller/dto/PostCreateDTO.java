@@ -22,11 +22,11 @@ public class PostCreateDTO {
 //    private Long memberId; => 게시글 생성시 접속 세션에서 Id조회
 
     @Builder
-    public PostCreateDTO(String title, String content, List<Long> tagId, Long memberId) {
+    public PostCreateDTO(String title, String content, List<Long> tagId) {
         this.title = title;
         this.content = content;
         this.tagId = tagId;
-        this.memberId = memberId;
+//        this.memberId=this.memberId; 게시글 생성시 접속 세션에서 Id조회
     }
 
 

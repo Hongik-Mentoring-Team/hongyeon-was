@@ -154,8 +154,7 @@ public class Member {
     }
 
     public void setMainBadgeUrl(String url) {
-        this.mainBadgeUrl=url;
-
+        this.mainBadgeUrl = url;
     }
 
     public void addFollower(Follow follower) {

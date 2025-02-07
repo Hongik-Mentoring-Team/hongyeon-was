@@ -1,11 +1,13 @@
 package com.hongik.mentor.hongik_mentor.config;
 
 import com.hongik.mentor.hongik_mentor.constant.ConstantUri;
+import com.hongik.mentor.hongik_mentor.controller.dto.MemberAdminDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.MemberResponseDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.chat.ChatMessageDto;
 import com.hongik.mentor.hongik_mentor.domain.SocialProvider;
 import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
 import com.hongik.mentor.hongik_mentor.exception.SendMessageException;
+import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
 import com.hongik.mentor.hongik_mentor.service.ChatService;
 import com.hongik.mentor.hongik_mentor.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.util.Collections;
@@ -151,7 +154,7 @@ public class StompChannelInterceptor implements ChannelInterceptor {
      *
      * */
     private boolean isInChatroom(String destination, String socialId, SocialProvider socialProvider) {
-        MemberResponseDto dto = memberService.findBySocialId(socialId, socialProvider).orElseThrow();
+        MemberAdminDto dto = memberService.findBySocialId(socialId, socialProvider).orElseThrow();
 
         Long chatRoomId = Long.parseLong(destination.substring(ConstantUri.SUBSCRIBE_PREFIX.length()));
         boolean isInChatroom = chatService.findChatRoomByMemberId(dto.getId())
@@ -159,10 +162,11 @@ public class StompChannelInterceptor implements ChannelInterceptor {
         return isInChatroom;
     }
     private boolean isInChatroom(ChatMessageDto messageDto, String socialId, SocialProvider socialProvider) {
-        MemberResponseDto dto = memberService.findBySocialId(socialId, socialProvider).orElseThrow();
+        MemberAdminDto dto = memberService.findBySocialId(socialId, socialProvider).orElseThrow();
         Long chatRoomId = messageDto.getChatRoomId();
         boolean isInChatroom = chatService.findChatRoomByMemberId(dto.getId())
                 .stream().anyMatch(chatRoomResponseDto -> chatRoomResponseDto.getId().equals(chatRoomId));
         return isInChatroom;
     }
+
 }

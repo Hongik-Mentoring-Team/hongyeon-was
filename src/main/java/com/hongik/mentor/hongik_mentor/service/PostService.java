@@ -28,9 +28,9 @@ public class PostService {
     private final TagRepository tagRepository;
 
     @Transactional
-    public Long createPost(PostCreateDTO postCreateDTO) {
+    public Long createPost(PostCreateDTO postCreateDTO, Long memberId) {
 
-        Member member = memberRepository.findById(postCreateDTO.getMemberId());
+        Member member = memberRepository.findById(memberId).orElseThrow();
 
         Post post = Post.builder()
                 .member(member)
@@ -127,7 +127,7 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
 
-        Member member = memberRepository.findById(memberId);
+        Member member = memberRepository.findById(memberId).orElseThrow();
 
         try {
             post.addApplicant(member);
@@ -161,7 +161,7 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
 
-        Member member = memberRepository.findById(memberId);
+        Member member = memberRepository.findById(memberId).orElseThrow();
 
         post.cancelApplicant(member);
         postRepository.save(post);
