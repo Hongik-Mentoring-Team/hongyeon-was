@@ -9,6 +9,7 @@ import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
 import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
 import com.hongik.mentor.hongik_mentor.repository.PostRepository;
 import com.hongik.mentor.hongik_mentor.repository.TagRepository;
+import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -122,11 +123,18 @@ public class PostService {
 
     // 모집 지원 기능
     @Transactional
-    public void applyToPost(Long postId) {
+    public void applyToPost(Long postId, Long memberId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
 
-        post.addApplicant();
+        Member member = memberRepository.findById(memberId);
+
+        try {
+            post.addApplicant(member);
+        } catch (OptimisticLockException e) {
+            throw new RuntimeException("다시 시도해 주세요.");
+        }
+
         postRepository.save(post);
     }
 
@@ -144,17 +152,18 @@ public class PostService {
     public boolean isPostClosed(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
-
         return post.isClosed();
     }
 
     // 신청 취소 기능
     @Transactional
-    public void cancelApplication(Long postId) {
+    public void cancelApplication(Long postId, Long memberId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
 
-        post.cancelApplicant();
+        Member member = memberRepository.findById(memberId);
+
+        post.cancelApplicant(member);
         postRepository.save(post);
     }
 }
