@@ -11,9 +11,13 @@ import com.hongik.mentor.hongik_mentor.service.MemberService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -54,9 +58,9 @@ public class MemberApiController {
     }
 
     @GetMapping("/members/session")
-    public SessionMember getSessionMemberInfo(@LoginMember SessionMember sessionMember, HttpSession httpSession) {
+    public Map<String,Object> getSessionMemberInfo(@LoginMember SessionMember sessionMember, HttpSession httpSession) {
         log.info("세션멤버 조회 세션식별자: {}", httpSession.getId());
-        return sessionMember;
+        return Collections.singletonMap("name",sessionMember.getName());
     }
 
     @GetMapping("/members/me")
