@@ -9,10 +9,11 @@ import lombok.NoArgsConstructor;
 @Entity
 public class ChatRoomMember {
     @Id @GeneratedValue
+    @Column(name = "chatroom_member_id")
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "member_id")
     private Member member;
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "chatroom_id")
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "chatroom_id", nullable = false)  //양방향, 영속성 관리는 ChatRoom이 함
     private ChatRoom chatRoom;
     private String nickname;
 

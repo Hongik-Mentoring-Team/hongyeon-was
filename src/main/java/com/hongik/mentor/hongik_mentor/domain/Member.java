@@ -82,7 +82,7 @@ public class Member {
     private Tier tier;
     private Long rank_value;
 
-    private AccountStatus accountStatus; //null 주의
+    private AccountStatus accountStatus; //생성시 자동주입
 
     // 내가 작성한 리뷰
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL, orphanRemoval = true)

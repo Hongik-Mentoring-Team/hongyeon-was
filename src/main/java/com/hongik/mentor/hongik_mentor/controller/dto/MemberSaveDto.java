@@ -9,13 +9,12 @@ import lombok.RequiredArgsConstructor;
 
 @Getter @RequiredArgsConstructor
 public class MemberSaveDto {
-    private final String socialId;    //socialId+provider를 조합하여 유저를 구분함
-    private final SocialProvider socialProvider;
-    private final String name;
-    private final String major;
-    private final Integer graduationYear;
-
-    private AccountStatus accountStatus;
+    //socialId+provider를 조합하여 유저를 구분함
+    private final String socialId;                  //From SessionMember
+    private final SocialProvider socialProvider;    //From SessionMember
+    private final String name;              //From client
+    private final String major;             //From client
+    private final Integer graduationYear;   //From client
 
 
     public Member toEntity() {
