@@ -86,10 +86,7 @@ public class FollowServiceTest {
         memberRepository.save(member1);
         memberRepository.save(member2);
 
-        Follow follow = Follow.builder()
-                .follower(member1)
-                .following(member2)
-                .build();
+        Follow follow = createFollow(member1, member2);
 
         Follow savedFollow = followRepository.save(follow);
 
@@ -103,10 +100,10 @@ public class FollowServiceTest {
 //                .hasMessage("해당유저를 팔로우했던 결과가 존재하지 않습니다.");
      }
 
-     @DisplayName("한 사람이 팔로우하고 있는 내역을 모두 조회한다. 즉 팔로잉 내역 조회")
+     @DisplayName("한 사람을 팔로우하고 있는 사람의 수와 내역들을 모두 조회한다. 즉 팔로우 내역 조회")
      @Test
      @Transactional
-     void test(){
+     void getFollowerStatus(){
 
          //given
          Member member1 = new Member("1111", SocialProvider.GOOGLE, "박승범", "컴퓨터공학과", 2025);
@@ -119,15 +116,9 @@ public class FollowServiceTest {
          memberRepository.save(member2);
          memberRepository.save(member3);
 
-         Follow follow1 = Follow.builder()
-                 .follower(member1)
-                 .following(member2)
-                 .build();
+         Follow follow1 = createFollow(member1, member2);
 
-         Follow follow2 = Follow.builder()
-                 .follower(member1)
-                 .following(member3)
-                 .build();
+         Follow follow2 = createFollow(member1, member3);
 
          followRepository.saveAll(List.of(follow1, follow2));
 
@@ -146,6 +137,53 @@ public class FollowServiceTest {
                  );
 
      }
+
+
+     @DisplayName("한 사람이 팔로우 하고 있는 사람의 수와 팔로우하고 있는 내역들을 모두 조회한다. 즉, 팔로잉 내역 조회 ")
+     @Test
+     @Transactional
+     void getFollowingStatus(){
+
+         //given
+         Member member1 = new Member("1111", SocialProvider.GOOGLE, "박승범", "컴퓨터공학과", 2025);
+
+         Member member2 = new Member("2222", SocialProvider.GOOGLE, "최근호", "컴퓨터공학과", 2025);
+
+         Member member3 = new Member("3333", SocialProvider.GOOGLE, "전형진", "컴퓨터공학과", 2025);
+
+         memberRepository.save(member1);
+         memberRepository.save(member2);
+         memberRepository.save(member3);
+
+        Follow follow1 = createFollow(member2, member1);
+        Follow follow2 = createFollow(member3, member1);
+
+        followRepository.saveAll(List.of(follow1, follow2));
+
+
+        //when
+        int numOfFollowers = followRepository.countByFollowingId(member1.getId());
+
+        List<Follow> followers = followRepository.findByFollowingId(member1.getId());
+
+        //then
+        assertThat(numOfFollowers).isEqualTo(2);
+        assertThat(followers).hasSize(2)
+                .extracting("follower.id", "following.id")
+                .containsExactlyInAnyOrder(
+                        tuple(member2.getId(), member1.getId()),
+                        tuple(member3.getId(), member1.getId())
+                );
+
+     }
+
+    private Follow createFollow(Member follower, Member followee) {
+        Follow follow = Follow.builder()
+                .follower(follower)
+                .following(followee)
+                .build();
+        return follow;
+    }
 
 
 }

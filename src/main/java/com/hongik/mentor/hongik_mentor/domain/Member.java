@@ -1,21 +1,16 @@
 package com.hongik.mentor.hongik_mentor.domain;
 
 
+import com.hongik.mentor.hongik_mentor.domain.post.Post;
 import com.hongik.mentor.hongik_mentor.domain.tier.Tier;
 import com.hongik.mentor.hongik_mentor.domain.tier.TierAssigner;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.ArrayList;
-
-import java.util.List;
 
 //회원 엔티티
 /*고려사항

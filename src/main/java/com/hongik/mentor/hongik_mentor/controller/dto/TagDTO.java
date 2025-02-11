@@ -1,6 +1,6 @@
 package com.hongik.mentor.hongik_mentor.controller.dto;
 
-import com.hongik.mentor.hongik_mentor.domain.Tag;
+import com.hongik.mentor.hongik_mentor.domain.post.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

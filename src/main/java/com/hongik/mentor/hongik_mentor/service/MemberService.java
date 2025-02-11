@@ -12,6 +12,7 @@ import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
 import com.hongik.mentor.hongik_mentor.repository.FollowRepository;
 import com.hongik.mentor.hongik_mentor.repository.BadgeRepository;
 import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
+import com.hongik.mentor.hongik_mentor.service.dto.FollowStatusDto;
 import com.univcert.api.UnivCert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -143,6 +144,21 @@ public class MemberService {
         followRepository.delete(follow);
 
 //        followRepository.deleteById(followId);
+    }
+
+    public FollowStatusDto getFollowStatus(Long memberId){
+
+        int numOfFollowers = followRepository.countByFollowerId(memberId);
+
+        int numOfFollowings = followRepository.countByFollowingId(memberId);
+
+
+        return FollowStatusDto.builder()
+                .memberId(memberId)
+                .followers(numOfFollowers)
+                .followings(numOfFollowings)
+                .build();
+
     }
 
 

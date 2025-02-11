@@ -1,9 +1,10 @@
-package com.hongik.mentor.hongik_mentor.controller;
+package com.hongik.mentor.hongik_mentor.controller.post;
 
 import com.hongik.mentor.hongik_mentor.controller.dto.PostCreateDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostModifyDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.SearchByTagDto;
+import com.hongik.mentor.hongik_mentor.controller.swagger.PostControllerDocs;
 import com.hongik.mentor.hongik_mentor.service.PostService;
 import com.hongik.mentor.hongik_mentor.service.dto.PostLikeDTO;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class PostController {
+public class PostController implements PostControllerDocs {
 
     private final PostService postService;
 
@@ -48,8 +49,8 @@ public class PostController {
     }
 
     @GetMapping("/api/posts/search")
-    public ResponseEntity<?> searchPostByTags(@RequestBody SearchByTagDto searchByTagDto) {
-        List<PostDTO> postDTOS = postService.searchPostsByTags(searchByTagDto.getTagIds());
+    public ResponseEntity<?> searchPostByTags(@RequestParam List<Long> tags) {
+        List<PostDTO> postDTOS = postService.searchPostsByTags(tags);
 
         return ResponseEntity.ok(postDTOS);
     }

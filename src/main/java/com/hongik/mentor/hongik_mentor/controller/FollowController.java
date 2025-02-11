@@ -2,6 +2,7 @@ package com.hongik.mentor.hongik_mentor.controller;
 
 import com.hongik.mentor.hongik_mentor.controller.dto.FollowRequestDTO;
 import com.hongik.mentor.hongik_mentor.service.MemberService;
+import com.hongik.mentor.hongik_mentor.service.dto.FollowStatusDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,13 @@ public class FollowController {
         memberService.unfollowMember(followId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/api/follow/{memberId}")
+    public ResponseEntity<?> getFollowStatus(@PathVariable Long memberId){
+        FollowStatusDto followStatus = memberService.getFollowStatus(memberId);
+
+        return ResponseEntity.ok(followStatus);
     }
 
 

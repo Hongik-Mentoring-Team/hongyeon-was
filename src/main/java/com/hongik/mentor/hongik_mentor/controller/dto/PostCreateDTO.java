@@ -1,8 +1,6 @@
 package com.hongik.mentor.hongik_mentor.controller.dto;
 
 
-import com.hongik.mentor.hongik_mentor.domain.Post;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;

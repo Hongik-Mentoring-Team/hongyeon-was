@@ -1,13 +1,13 @@
 package com.hongik.mentor.hongik_mentor.repository;
 
-import com.hongik.mentor.hongik_mentor.domain.Post;
-import com.hongik.mentor.hongik_mentor.domain.QPost;
-import com.hongik.mentor.hongik_mentor.domain.QPostTag;
-import com.hongik.mentor.hongik_mentor.domain.QTag;
+import com.hongik.mentor.hongik_mentor.domain.post.Post;
+
+import com.hongik.mentor.hongik_mentor.domain.post.QPost;
+import com.hongik.mentor.hongik_mentor.domain.post.QPostTag;
+import com.hongik.mentor.hongik_mentor.domain.post.QTag;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +19,8 @@ public class PostSearchRepositoryImpl implements PostSearchRepository{
     public PostSearchRepositoryImpl(EntityManager em) {
         this.queryFactory = new JPAQueryFactory(em);
     }
+
+
 
     public Optional<Post> getPostById(Long id) {
         QPost p = QPost.post;
