@@ -31,7 +31,7 @@ public class CommentService {
     @Transactional
     public CreatedCommentDto createComment(CommentCreateDto request) {
 
-        Member member = memberRepository.findById(request.getMemberId());
+        Member member = memberRepository.findById(request.getMemberId()).get();
 
         Post post = postRepository.findById(request.getPostId())
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
