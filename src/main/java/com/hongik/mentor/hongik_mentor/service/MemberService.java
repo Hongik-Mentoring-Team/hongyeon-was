@@ -140,7 +140,7 @@ public class MemberService {
 
         Follow follow = Follow.builder()
                 .follower(follower)
-                .following(followee)
+                .followee(followee)
                 .build();
 
         follower.addFollower(follow);

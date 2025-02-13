@@ -1,9 +1,6 @@
 package com.hongik.mentor.hongik_mentor.repository;
 
-import com.hongik.mentor.hongik_mentor.domain.Post;
-import com.hongik.mentor.hongik_mentor.domain.QPost;
-import com.hongik.mentor.hongik_mentor.domain.QPostTag;
-import com.hongik.mentor.hongik_mentor.domain.QTag;
+import com.hongik.mentor.hongik_mentor.domain.*;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -31,7 +28,7 @@ public class PostSearchRepositoryImpl implements PostSearchRepository{
 
         return Optional.ofNullable(post);
     }
-
+/* 성능 개선 요소: 아래 SearchByTag / Category / TagsAndCategory 함수를 동적쿼리를 사용해서 하나로 변경가능*/
     @Override
     public List<Post> searchByTags(List<Long> tagIds) {
         QPost p = QPost.post;
@@ -52,4 +49,35 @@ public class PostSearchRepositoryImpl implements PostSearchRepository{
 
         return posts;
     }
+
+    @Override
+    public List<Post> searchByTagsAndCategory(List<Long> tagIds, Category category) {
+        QPost p = QPost.post;
+        QPostTag pt = QPostTag.postTag;
+        List<Post> posts = queryFactory
+                .selectFrom(p)
+                .where(p.category.eq(category))
+                .where(p.id.in(
+                        JPAExpressions
+                                .select(pt.post.id)
+                                .from(pt)
+                                .where(pt.tag.id.in(tagIds))
+                                .groupBy(pt.post.id)
+                                .having(pt.tag.id.count().eq((long) tagIds.size()))
+                ))
+                .fetch();
+
+        return posts;
+    }
+
+    @Override
+    public List<Post> searchByCategory(Category category) {
+        QPost p = QPost.post;
+
+        return queryFactory
+                .selectFrom(p)
+                .where(p.category.eq(category))
+                .fetch();
+    }
+
 }

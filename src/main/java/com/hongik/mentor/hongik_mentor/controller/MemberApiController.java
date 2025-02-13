@@ -7,12 +7,15 @@ import com.hongik.mentor.hongik_mentor.domain.Member;
 import com.hongik.mentor.hongik_mentor.domain.SocialProvider;
 import com.hongik.mentor.hongik_mentor.oauth.LoginMember;
 import com.hongik.mentor.hongik_mentor.oauth.dto.SessionMember;
+import com.hongik.mentor.hongik_mentor.oauth.util.SessionUtil;
 import com.hongik.mentor.hongik_mentor.service.MemberService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -52,21 +55,27 @@ public class MemberApiController {
         List<MemberResponseDto> findMembers = memberService.findAll();
         return findMembers;
     }
+
     @GetMapping("/members/{id}")
     public MemberResponseDto findMember(@PathVariable Long id) {
         return memberService.findById(id);
     }
 
-    @GetMapping("/members/session")
-    public Map<String,Object> getSessionMemberInfo(@LoginMember SessionMember sessionMember, HttpSession httpSession) {
-        log.info("세션멤버 조회 세션식별자: {}", httpSession.getId());
-        return Collections.singletonMap("name",sessionMember.getName());
+    @GetMapping("/members/me")
+    public MemberResponseDto getMemberProfile(HttpSession httpSession) {
+        log.info("getMemberProfile 요청 세션: {}", httpSession.getId());
+        Long memberId = SessionUtil.getCurrentMemberId(httpSession);
+
+        MemberResponseDto dto = memberService.findById(memberId);
+        return dto;
     }
 
-    @GetMapping("/members/me")
-    public MemberResponseDto getMemberProfile(@LoginMember SessionMember sessionMember) {
-        MemberResponseDto dto = memberService.findById(sessionMember.getId());
-        return dto;
+    @GetMapping("/members/session")
+    public ResponseEntity<?> getSessionMemberInfo(@LoginMember SessionMember sessionMember, HttpSession httpSession) {
+        if(sessionMember==null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("현재 로그인된 세션이 없습니다");
+
+        log.info("세션멤버 조회 세션식별자: {}", httpSession.getId());
+        return ResponseEntity.ok(Collections.singletonMap("name",sessionMember.getName()));
     }
 
 /*  //Member 리소스 수정

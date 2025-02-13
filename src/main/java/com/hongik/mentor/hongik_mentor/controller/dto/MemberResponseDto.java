@@ -10,7 +10,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 public class MemberResponseDto {
@@ -25,8 +28,15 @@ public class MemberResponseDto {
     private Role role;
     private List<MemberBadgeResponseDto> badges = new ArrayList<>();
     private String mainBadgeUrl;
+    private String imageUrl;
     private Tier tier;
     private Long rank_value;
+
+    private List<PostDTO> posts = new ArrayList<>();
+    private Set<Long> followings = new HashSet<>();
+    private Set<Long> followers = new HashSet<>();
+    private List<ReviewResponseDto> writtedReviews = new ArrayList<>();
+    private List<ReviewResponseDto> receivedReviews = new ArrayList<>();
 
 
     public MemberResponseDto(Member member) {
@@ -39,16 +49,39 @@ public class MemberResponseDto {
         this.accountStatus=member.getAccountStatus();
         this.role = member.getRole();
         member.getBadges()
-                .stream()
-                .map(badge -> new MemberBadgeResponseDto(badge))
-                .forEach(dto -> badges.add(dto));
+                .forEach(badge -> {
+                    MemberBadgeResponseDto dto = new MemberBadgeResponseDto(badge);
+                    badges.add(dto);
+                });
         this.mainBadgeUrl = member.getMainBadgeUrl();
         this.tier = member.getTier();
         this.rank_value = member.getRank_value();
+        this.imageUrl = member.getImageUrl();
+
+        member.getPosts()
+                .forEach(post -> {
+                    PostDTO postDTO = PostDTO.fromPost(post);
+                    posts.add(postDTO);
+                });
+        member.getFollowers()
+                .forEach(follower -> {
+                    Long followerId = follower.getFollower().getId();
+                    followers.add(followerId);
+                });
+        member.getFollowings()
+                .forEach(following->{
+                    Long followeeId = following.getFollowee().getId();
+                    followings.add(followeeId);
+                });
+        member.getWrittenReviews()
+                .stream()
+                .map(ReviewResponseDto::fromEntity)
+                .forEach(dto->writtedReviews.add(dto));
+        member.getReceivedReviews()
+                .stream()
+                .map(ReviewResponseDto::fromEntity)
+                .forEach(dto->receivedReviews.add(dto));
 
     }
 
-    public Member toEntity() {
-        return new Member(socialId, socialProvider, name, major, graduationYear);
-    }
 }

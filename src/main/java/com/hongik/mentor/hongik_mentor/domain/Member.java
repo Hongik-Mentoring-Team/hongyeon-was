@@ -5,17 +5,11 @@ import com.hongik.mentor.hongik_mentor.domain.tier.Tier;
 import com.hongik.mentor.hongik_mentor.domain.tier.TierAssigner;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.ArrayList;
-
-import java.util.List;
 
 //회원 엔티티
 /*고려사항
@@ -70,7 +64,7 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "followee", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Follow> followings = new HashSet<>();
 
     @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -81,7 +75,10 @@ public class Member {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberBadge> badges = new ArrayList<>();
+
     private String mainBadgeUrl;
+
+    private String imageUrl;
 
     @Enumerated(EnumType.STRING)
     private Tier tier;
@@ -114,6 +111,7 @@ public class Member {
             this.type=MemberType.STUDENT;
         }*/
         this.mainBadgeUrl = "";
+        this.imageUrl = "";
         this.type = MemberType.TEMP;
         this.accountStatus = AccountStatus.ACTIVE;
         this.role = Role.USER;

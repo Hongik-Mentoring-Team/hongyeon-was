@@ -101,7 +101,7 @@ public class ChatService {
 
     //초기 채팅방 생성
     @Transactional
-    public Long initiateChat(ChatInitiateDto requestDto) {
+    public Long initiateChat(ChatInitiateDto requestDto) {  // 성능 개선 가능: saveChatRoomMembers()를 제거하고 saveChatRoom()에서 모두 처리가 가능할듯
         String roomName = requestDto.getRoomName();
         Long roomId = this.saveChatRoom(new ChatRoomDto(roomName));
         this.saveChatRoomMembers(roomId, requestDto.getMembersInfo());

@@ -1,5 +1,6 @@
 package com.hongik.mentor.hongik_mentor.controller.dto;
 
+import com.hongik.mentor.hongik_mentor.domain.Category;
 import com.hongik.mentor.hongik_mentor.domain.Post;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +27,8 @@ public class PostDTO {
 
     private List<TagDTO> tags;
 
+    private Category category;
+
     public static PostDTO fromPost(Post post) {
         return PostDTO.builder()
                 .postId(post.getId())
@@ -34,6 +37,7 @@ public class PostDTO {
                 .createAt(post.getCreatedAt())
                 .tags(post.getTags().stream()
                         .map(postTag -> TagDTO.fromTag(postTag.getTag())).toList())
+                .category(post.getCategory())
                 .build();
 
 

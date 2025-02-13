@@ -88,7 +88,7 @@ public class FollowServiceTest {
 
         Follow follow = Follow.builder()
                 .follower(member1)
-                .following(member2)
+                .followee(member2)
                 .build();
 
         Follow savedFollow = followRepository.save(follow);
@@ -121,12 +121,12 @@ public class FollowServiceTest {
 
          Follow follow1 = Follow.builder()
                  .follower(member1)
-                 .following(member2)
+                 .followee(member2)
                  .build();
 
          Follow follow2 = Follow.builder()
                  .follower(member1)
-                 .following(member3)
+                 .followee(member3)
                  .build();
 
          followRepository.saveAll(List.of(follow1, follow2));

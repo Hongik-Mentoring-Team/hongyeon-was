@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -36,6 +37,7 @@ public class PostService {
                 .member(member)
                 .title(postCreateDTO.getTitle())
                 .content(postCreateDTO.getContent())
+                .category(postCreateDTO.getCategory())
                 .build();
 
 
@@ -90,16 +92,26 @@ public class PostService {
         return postId;
     }
 
-    public List<PostDTO> searchPostsByTags(List<Long> tagIds){ // 태그들 기반 검색
-        List<Post> posts = postRepository.searchByTags(tagIds);
 
-        if (posts.isEmpty()) {
-            throw new RuntimeException("Post not found");
+    public List<PostDTO> searchPostsByTags(Category category, List<Long> tagIds) {
+        List<Post> posts=new ArrayList<>();
+
+        if (category == null) {
+            posts = postRepository.searchByTags(tagIds);
+        } else if (tagIds == null) {
+            posts = postRepository.searchByCategory(category);
+        } else {
+            posts = postRepository.searchByTagsAndCategory(tagIds, category);
         }
 
+        if(posts.isEmpty()) return List.of();
+
         return posts.stream()
-                .map(PostDTO::fromPost).toList();
+                .map(PostDTO::fromPost)
+                .toList();
+
     }
+
 
     @Transactional
     public Long thumbUp(Long postId, Long memberId) { // 좋아요 기능
@@ -165,5 +177,12 @@ public class PostService {
 
         post.cancelApplicant(member);
         postRepository.save(post);
+    }
+
+    /** Tag
+     *
+     * */
+    public List<Tag> getTags() {
+        return tagRepository.findAll();
     }
 }
