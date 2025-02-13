@@ -38,10 +38,6 @@ class PostServiceTest {
     @Autowired
     private CommentRepository commentRepository;
 
-    @Autowired
-    private CommentService commentService;
-
-
 
     @DisplayName("게시글 생성을 성공한다.")
     @Test
@@ -55,7 +51,7 @@ class PostServiceTest {
         PostCreateDTO request = PostCreateDTO.builder()
                 .title("게시글 1")
                 .content("내용 1")
-                .memberId(1L)
+                .memberId(member.getId())
                 .tagId(List.of(1L, 2L))
                 .build();
 
@@ -154,11 +150,11 @@ class PostServiceTest {
 
         memberRepository.save(member);
 
-        PostCreateDTO request1 = createPostForTest("게시글 1", "내용 1", 1L, List.of(1L, 2L));
+        PostCreateDTO request1 = createPostForTest("게시글 1", "내용 1", member.getId(), List.of(1L, 2L));
 
-        PostCreateDTO request2 = createPostForTest("게시글 2", "내용 1", 1L, List.of(2L, 3L));
+        PostCreateDTO request2 = createPostForTest("게시글 2", "내용 1", member.getId(), List.of(2L, 3L));
 
-        PostCreateDTO request3 = createPostForTest("게시글 3", "내용 1", 1L, List.of(1L, 3L));
+        PostCreateDTO request3 = createPostForTest("게시글 3", "내용 1", member.getId(), List.of(1L, 3L));
 
         postService.createPost(request1);
         postService.createPost(request2);
@@ -243,14 +239,14 @@ class PostServiceTest {
 
 
         //when
-        Long postIdAfterLikeBtn = postService.thumbUp(1L, 1L);
+        Long postIdAfterLikeBtn = postService.thumbUp(post.getId(), member.getId());
 
         Post postAfterLikeBtn = postRepository.findById(postIdAfterLikeBtn).get();
 
         //then
         assertThat(postAfterLikeBtn.getLikes()).hasSize(1)
                 .extracting("member.id")
-                .containsExactly(1L);
+                .containsExactly(member.getId());
 
     }
 
@@ -266,7 +262,7 @@ class PostServiceTest {
         PostCreateDTO request = PostCreateDTO.builder()
                 .title("게시글 1")
                 .content("내용 1")
-                .memberId(1L)
+                .memberId(member.getId())
                 .tagId(List.of(1L, 2L))
                 .build();
 
@@ -291,7 +287,7 @@ class PostServiceTest {
 
         commentRepository.saveAll(List.of(comment1, comment2));
 
-        postService.thumbUp(1L, 1L);
+        postService.thumbUp(post.getId(), member.getId());
 
         //when
         postService.deletePost(createdPostId);

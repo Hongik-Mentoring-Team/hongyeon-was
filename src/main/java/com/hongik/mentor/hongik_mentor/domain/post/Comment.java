@@ -49,4 +49,8 @@ public class Comment {
         post.addComment(comment);
         return comment;
     }
+
+    public void modifyContent(String newContent) {
+        this.content = newContent;
+    }
 }

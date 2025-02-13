@@ -45,5 +45,23 @@ public class CommentService {
         return new CreatedCommentDto(comment.getId());
     }
 
+    public Long modifyComment(Long commentId, String newContent) {
 
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.COMMENT_NOT_EXISTS));
+
+        comment.modifyContent(newContent);
+
+        commentRepository.save(comment);
+
+        return comment.getId();
+    }
+
+
+    public void deleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.COMMENT_NOT_EXISTS));
+
+        commentRepository.delete(comment);
+    }
 }

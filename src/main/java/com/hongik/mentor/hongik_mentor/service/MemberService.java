@@ -134,9 +134,11 @@ public class MemberService {
 
     @Transactional
     public Long followMember(FollowRequestDTO followRequestDTO){ // followerId : 팔로우를 하려는 회원, followingId : 팔로우를 당하는 회원
-        Member follower = memberRepository.findById(followRequestDTO.getFollowerId());
+        Member follower = memberRepository.findById(followRequestDTO.getFollowerId())
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.MEMBER_NOT_EXISTS));
 
-        Member followee = memberRepository.findById(followRequestDTO.getFolloweeId());
+        Member followee = memberRepository.findById(followRequestDTO.getFolloweeId())
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.MEMBER_NOT_EXISTS));
 
         Follow follow = Follow.builder()
                 .follower(follower)
