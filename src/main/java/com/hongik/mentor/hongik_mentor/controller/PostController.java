@@ -4,6 +4,7 @@ import com.hongik.mentor.hongik_mentor.controller.dto.PostCreateDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostModifyDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.SearchByTagDto;
+import com.hongik.mentor.hongik_mentor.controller.dto.comment.CommentReqDto;
 import com.hongik.mentor.hongik_mentor.domain.Category;
 import com.hongik.mentor.hongik_mentor.domain.Tag;
 import com.hongik.mentor.hongik_mentor.oauth.util.SessionUtil;
@@ -36,8 +37,8 @@ public class PostController {
     }
 
     @GetMapping("/post/{postId}")
-    public ResponseEntity<?> getPost(@PathVariable Long postId) {
-        PostDTO post = postService.getPost(postId);
+    public ResponseEntity<?> getPost(@PathVariable Long postId, HttpSession httpSession) {
+        PostDTO post = postService.getPost(postId, SessionUtil.getCurrentMemberId(httpSession));
 
         return ResponseEntity.ok(post);
     }
@@ -80,5 +81,28 @@ public class PostController {
         List<Tag> tags = postService.getTags();
         log.info(tags.toString());
         return ResponseEntity.ok(tags);
+    }
+
+    /**
+     * Comment API
+     */
+    @PostMapping("/post/{postId}/comments")
+    public ResponseEntity<?> createComment(@PathVariable Long postId,
+                                           @RequestBody CommentReqDto dto,
+                                           HttpSession httpSession) {
+        postService.createComment(dto,SessionUtil.getCurrentMemberId(httpSession));
+
+        return ResponseEntity.ok().body("댓글을 달았습니다");
+    }
+
+    /**
+     * Applicant API
+     */
+    @GetMapping("/post/{postId}/apply")
+    public ResponseEntity<?> createApplicant(@PathVariable Long postId, HttpSession httpSession) {
+        Long applicantId = SessionUtil.getCurrentMemberId(httpSession);
+        postService.applyToPost(postId,applicantId);
+
+        return ResponseEntity.ok().body("지원에 성공했습니다!");
     }
 }

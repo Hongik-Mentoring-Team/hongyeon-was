@@ -2,6 +2,9 @@ package com.hongik.mentor.hongik_mentor.domain;
 
 import com.hongik.mentor.hongik_mentor.controller.dto.PostCreateDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostModifyDTO;
+import com.hongik.mentor.hongik_mentor.domain.chat.ChatRoomType;
+import com.hongik.mentor.hongik_mentor.exception.CustomMentorException;
+import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
@@ -28,6 +31,7 @@ public class Post {
 
     private String content;
 
+    //게시판   ex)멘토 게시판/멘티 게시판
     @Enumerated(EnumType.STRING)
     private Category category;
 
@@ -51,11 +55,21 @@ public class Post {
     private List<PostLike> likes = new ArrayList<>();
 
     //모집인원
-    private int capacity;
+    @Column(nullable = false)
+    private int capacity;   //멘티 게시글: -1
+
+    //해당 게시글로부터 생성될 채팅방 타입
+    @Enumerated(EnumType.STRING)
+    private ChatRoomType chatRoomType;
 
     //현재 신청자 수
     @Builder.Default
     private int currentApplicants = 0;
+
+    //신청자 멤버 리스트
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true) //Post가 영속성 관리
+    @Builder.Default
+    private List<Applicant> applicants = new ArrayList<>();
 
     //모집 마감 여부
     @Builder.Default
@@ -82,6 +96,7 @@ public class Post {
         this.content = content;
         this.tags.addAll(postTags);
     }
+/* => Applicant엔티티 도입
 
     //신청자 멤버 리스트
     @ManyToMany
@@ -92,32 +107,58 @@ public class Post {
     )
     @Builder.Default
     private List<Member> applicants = new ArrayList<>();
+*/
 
 
     //신청자 추가
     public void addApplicant(Member member) {
-        if (isClosed) {
-            throw new IllegalStateException("모집이 이미 마감되었습니다.");
-        }
-        if (this.applicants.contains(member)) {
-            throw new IllegalStateException("이미 신청한 회원입니다.");
+        try {
+            if (isClosed) {
+                throw new RuntimeException("모집 마감된 게시글입니다");
+            }
+
+            List<Long> appliedMembersId = this.applicants
+                    .stream()
+                    .map(applicant -> applicant.getMember().getId())
+                    .toList();
+            if (appliedMembersId.contains(member.getId())) {    //기신청된 회원
+
+                throw new CustomMentorException(ErrorCode.DUPLICATE_MENTORING_APPLY);
+            }
+
+            this.currentApplicants++;
+            this.applicants.add(Applicant.builder()
+                    .post(this)
+                    .member(member)
+                    .build());
+
+            if (this.currentApplicants >= this.capacity) {
+                this.isClosed = true;
+            }
+        } catch (CustomMentorException e1) {
+            throw e1;
+        } catch (RuntimeException e2) {
+            throw new CustomMentorException(e2, ErrorCode.FAILED_TO_APPLY);
         }
 
-        this.currentApplicants++;
-        this.applicants.add(member);
-        if (this.currentApplicants >= this.capacity) {
-            this.isClosed = true;
-        }
     }
 
     //신청 취소
     public void cancelApplicant(Member member) {
-        if (!this.applicants.contains(member)) {
+        List<Long> appliedMembersId = this.applicants.stream()
+                .map(applicant -> applicant.getMember().getId())
+                .toList();
+        if (!appliedMembersId.contains(member.getId())) {
             throw new IllegalStateException("신청한 적이 없는 회원입니다.");
         }
+
         this.currentApplicants--;
-        this.applicants.remove(member);
-        if (this.isClosed) {
+        Applicant hopeToCancel=new Applicant();
+        for (Applicant applicant : applicants)
+            if(applicant.getMember().getId()==member.getId()) hopeToCancel = applicant;
+        this.applicants.remove(hopeToCancel);
+
+        if (capacity>currentApplicants) {
             this.isClosed = false;
         }
     }

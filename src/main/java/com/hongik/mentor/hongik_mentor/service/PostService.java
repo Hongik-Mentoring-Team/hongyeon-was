@@ -3,6 +3,8 @@ package com.hongik.mentor.hongik_mentor.service;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostCreateDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostModifyDTO;
+import com.hongik.mentor.hongik_mentor.controller.dto.comment.CommentReqDto;
+import com.hongik.mentor.hongik_mentor.controller.dto.comment.CommentResDto;
 import com.hongik.mentor.hongik_mentor.domain.*;
 import com.hongik.mentor.hongik_mentor.exception.CustomMentorException;
 import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
@@ -38,10 +40,10 @@ public class PostService {
                 .title(postCreateDTO.getTitle())
                 .content(postCreateDTO.getContent())
                 .category(postCreateDTO.getCategory())
+                .capacity(postCreateDTO.getCategory() == Category.MENTOR ? postCreateDTO.getCapacity() : -1)
                 .build();
 
-
-        postCreateDTO.getTagId()
+        postCreateDTO.getTagIds()
                 .forEach(id -> {
                     Tag tag = tagRepository.findById(id).orElseThrow(() -> new RuntimeException("Tag not found"));
                     PostTag postTag = PostTag.of(tag, post);
@@ -53,12 +55,20 @@ public class PostService {
         return post.getId();
     }
 
-    public PostDTO getPost(Long postId){
+    public PostDTO getPost(Long postId, Long requesterId){
 
         Post post = postRepository.getPostById(postId)
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
 
-        return PostDTO.fromPost(post);
+        List<CommentResDto> commentResDtos = post.getComments().stream()
+                .map(comment -> {
+                    boolean isCommentOwner = requesterId.equals(comment.getMember().getId());
+                    return new CommentResDto(comment, isCommentOwner);
+                }).toList();
+
+        boolean isOwner = requesterId.equals(post.getMember().getId());
+
+        return PostDTO.fromPost(post,isOwner,commentResDtos);
     }
 
     @Transactional
@@ -184,5 +194,22 @@ public class PostService {
      * */
     public List<Tag> getTags() {
         return tagRepository.findAll();
+    }
+
+    /**
+     * Comment
+     */
+    @Transactional
+    public void createComment(CommentReqDto dto, Long memberId) {
+        Post findPost = postRepository.findById(dto.getPostId()).orElseThrow(() -> new IllegalStateException("댓글을 작성하신 게시글이 존재하지 않습니다"));
+        Member findMember = memberRepository.findById(memberId).orElseThrow();
+
+        findPost.getComments().add(Comment.builder()
+                .post(findPost)
+                .member(findMember)
+                .comment(dto.getComment())
+                .build());
+
+        postRepository.save(findPost);
     }
 }
