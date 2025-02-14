@@ -1,10 +1,8 @@
-package com.hongik.mentor.hongik_mentor.domain;
+package com.hongik.mentor.hongik_mentor.domain.post;
 
-import com.hongik.mentor.hongik_mentor.controller.dto.PostCreateDTO;
-import com.hongik.mentor.hongik_mentor.controller.dto.PostModifyDTO;
+import com.hongik.mentor.hongik_mentor.domain.Member;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.BatchSize;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -68,6 +66,10 @@ public class Post {
 
     public void addLikes(PostLike like){
         this.likes.add(like);
+    }
+
+    public void addComment(Comment comment){
+        this.comments.add(comment);
     }
 
     public void clearTags(){

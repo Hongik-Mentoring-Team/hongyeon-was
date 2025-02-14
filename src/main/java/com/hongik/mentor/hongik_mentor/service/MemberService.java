@@ -16,6 +16,7 @@ import com.hongik.mentor.hongik_mentor.repository.FollowRepository;
 
 import com.hongik.mentor.hongik_mentor.repository.BadgeRepository;
 import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
+import com.hongik.mentor.hongik_mentor.service.dto.FollowStatusDto;
 import com.univcert.api.UnivCert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -133,9 +134,11 @@ public class MemberService {
 
     @Transactional
     public Long followMember(FollowRequestDTO followRequestDTO){ // followerId : 팔로우를 하려는 회원, followingId : 팔로우를 당하는 회원
-        Member follower = memberRepository.findById(followRequestDTO.getFollowerId());
+        Member follower = memberRepository.findById(followRequestDTO.getFollowerId())
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.MEMBER_NOT_EXISTS));
 
-        Member followee = memberRepository.findById(followRequestDTO.getFolloweeId());
+        Member followee = memberRepository.findById(followRequestDTO.getFolloweeId())
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.MEMBER_NOT_EXISTS));
 
         Follow follow = Follow.builder()
                 .follower(follower)
@@ -161,6 +164,21 @@ public class MemberService {
         followRepository.delete(follow);
 
 //        followRepository.deleteById(followId);
+    }
+
+    public FollowStatusDto getFollowStatus(Long memberId){
+
+        int numOfFollowers = followRepository.countByFollowerId(memberId);
+
+        int numOfFollowings = followRepository.countByFollowingId(memberId);
+
+
+        return FollowStatusDto.builder()
+                .memberId(memberId)
+                .followers(numOfFollowers)
+                .followings(numOfFollowings)
+                .build();
+
     }
 
 

@@ -1,12 +1,14 @@
 package com.hongik.mentor.hongik_mentor.Initializer;
 
-import com.hongik.mentor.hongik_mentor.domain.Tag;
+import com.hongik.mentor.hongik_mentor.domain.post.Tag;
 import com.hongik.mentor.hongik_mentor.repository.TagRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-//@Component    //main 어플리케이션 클래스에서 수동 빈 등록
+import java.util.List;
+
+@Component    //main 어플리케이션 클래스에서 수동 빈 등록/
 @RequiredArgsConstructor
 public class TagInitializer {
 
@@ -32,10 +34,8 @@ public class TagInitializer {
                     .name("프론트엔드 개발자")
                     .build();
 
-            tagRepository.save(tag);
-            tagRepository.save(tag1);
-            tagRepository.save(tag2);
-            tagRepository.save(tag3);
+            tagRepository.saveAll(List.of(tag, tag1, tag2, tag3));
+
         }
     }
 }

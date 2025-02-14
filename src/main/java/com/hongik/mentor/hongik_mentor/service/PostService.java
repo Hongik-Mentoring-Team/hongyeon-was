@@ -4,6 +4,10 @@ import com.hongik.mentor.hongik_mentor.controller.dto.PostCreateDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostModifyDTO;
 import com.hongik.mentor.hongik_mentor.domain.*;
+import com.hongik.mentor.hongik_mentor.domain.post.Post;
+import com.hongik.mentor.hongik_mentor.domain.post.PostLike;
+import com.hongik.mentor.hongik_mentor.domain.post.PostTag;
+import com.hongik.mentor.hongik_mentor.domain.post.Tag;
 import com.hongik.mentor.hongik_mentor.exception.CustomMentorException;
 import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
 import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
@@ -30,7 +34,8 @@ public class PostService {
     @Transactional
     public Long createPost(PostCreateDTO postCreateDTO) {
 
-        Member member = memberRepository.findById(postCreateDTO.getMemberId());
+        Member member = memberRepository.findById(postCreateDTO.getMemberId())
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.MEMBER_NOT_EXISTS));
 
         Post post = Post.builder()
                 .member(member)
@@ -53,7 +58,7 @@ public class PostService {
 
     public PostDTO getPost(Long postId){
 
-        Post post = postRepository.getPostById(postId)
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
 
         return PostDTO.fromPost(post);
@@ -62,7 +67,7 @@ public class PostService {
     @Transactional
     public Long modifyPost(Long postId, PostModifyDTO postModifyDTO) {
 
-        Post post = postRepository.getPostById(postId)
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
 
         List<Tag> tags = postModifyDTO.getTagIds().stream()
@@ -108,17 +113,21 @@ public class PostService {
 
         Member member = memberRepository.findById(memberId).orElseThrow();
 
+        addLikesToPost(member, post);
+
+        postRepository.save(post);
+
+        return post.getId();
+
+    }
+
+    private void addLikesToPost(Member member, Post post) {
         PostLike postLike = PostLike.builder()
                 .member(member)
                 .post(post)
                 .build();
 
         post.addLikes(postLike);
-
-        postRepository.save(post);
-
-        return post.getId();
-
     }
 
     // 모집 지원 기능
@@ -127,7 +136,8 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
 
-        Member member = memberRepository.findById(memberId);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.MEMBER_NOT_EXISTS));
 
         try {
             post.addApplicant(member);
@@ -161,7 +171,8 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
 
-        Member member = memberRepository.findById(memberId);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.MEMBER_NOT_EXISTS));
 
         post.cancelApplicant(member);
         postRepository.save(post);
