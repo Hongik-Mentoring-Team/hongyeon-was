@@ -1,12 +1,16 @@
 package com.hongik.mentor.hongik_mentor.domain;
 
 
+import com.hongik.mentor.hongik_mentor.domain.post.Post;
+import com.hongik.mentor.hongik_mentor.domain.tier.Tier;
+import com.hongik.mentor.hongik_mentor.domain.tier.TierAssigner;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 //회원 엔티티
 /*고려사항
@@ -36,26 +40,57 @@ import java.time.LocalDate;
 @Getter
 @Entity
 public class Member {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)     //참고(sequence, table전략은 JPA에서 ID를 미리 할당받기에 쿼리를 지연 가능, 반면 identity는 즉시 쿼리 발생)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)     //참고(sequence, table전략은 JPA에서 ID를 미리 할당받기에 쿼리를 지연 가능, 반면 identity는 즉시 쿼리 발생)
     @Column(name = "member_id")
     private Long id;    //DB용 PK
+
     @Column(nullable = false)
     private String socialId;    //~userNameAttributeName              socialId+provider를 조합하여 유저를 구분함
+
     @Column(nullable = false) @Enumerated(EnumType.STRING)
     private SocialProvider socialProvider;  //~registrationId
+
     @Column(nullable = false)
     private String name;
+
     @Column(nullable = false)
     private String major;
+
     @Column(nullable = false)
     private Integer graduationYear;
+
     @Column(nullable = false) @Enumerated(EnumType.STRING)
     private MemberType type;    //재학생/졸업생
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Follow> followings = new HashSet<>();
+
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Follow> followers = new HashSet<>();
+
     @Column(nullable = false) @Enumerated(EnumType.STRING)
     private Role role;
 
-    private AccountStatus accountStatus; //null 주의
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberBadge> badges = new ArrayList<>();
+    private String mainBadgeUrl;
+
+    @Enumerated(EnumType.STRING)
+    private Tier tier;
+    private Long rank_value;
+
+    private AccountStatus accountStatus; //생성시 자동주입
+
+    // 내가 작성한 리뷰
+    @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> writtenReviews = new ArrayList<>();
+
+    // 나에 대한 리뷰
+    @OneToMany(mappedBy = "target", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> receivedReviews = new ArrayList<>();
 
     public Member() {
     }
@@ -68,14 +103,16 @@ public class Member {
         this.name = name;
         this.major = major;
         this.graduationYear = graduationYear;
-        if (graduationYear <= LocalDate.now().getYear()) {
+        /*if (graduationYear <= LocalDate.now().getYear()) {
             this.type = MemberType.GRADUATE;
         } else {
             this.type=MemberType.STUDENT;
-        }
+        }*/
+        this.type = MemberType.TEMP;
         this.accountStatus = AccountStatus.ACTIVE;
         this.role = Role.USER;
-
+        this.tier = TierAssigner.evaluate(0L);
+        this.rank_value = 0L;
     }
 
     //TEMP(임시) member생성
@@ -92,5 +129,34 @@ public class Member {
         this.type = memberType;
 
         return id;
+    }
+
+
+    // 평균 평점 계산 메서드
+    public double getAverageRating() {
+        if (receivedReviews.isEmpty()) {
+            return 0.0;
+        }
+        return receivedReviews.stream()
+                .mapToInt(Review::getRating)
+                .average()
+                .orElse(0.0);
+    }
+
+    public void addBadge(MemberBadge memberBadge) {
+        this.badges.add(memberBadge);
+    }
+
+    public void setMainBadgeUrl(String url) {
+        this.mainBadgeUrl=url;
+
+    }
+
+    public void addFollower(Follow follower) {
+        this.followers.add(follower);
+    }
+
+    public void addFollowing(Follow following) {
+        this.followings.add(following);
     }
 }
