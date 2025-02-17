@@ -21,4 +21,6 @@ public class Applicant {
     // 지원자
     @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "member_id")
     private Member member;
+
+    private String nickname;
 }

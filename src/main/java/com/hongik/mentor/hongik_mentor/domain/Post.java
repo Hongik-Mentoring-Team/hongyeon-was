@@ -2,6 +2,7 @@ package com.hongik.mentor.hongik_mentor.domain;
 
 import com.hongik.mentor.hongik_mentor.controller.dto.PostCreateDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostModifyDTO;
+import com.hongik.mentor.hongik_mentor.domain.chat.ChatRoom;
 import com.hongik.mentor.hongik_mentor.domain.chat.ChatRoomType;
 import com.hongik.mentor.hongik_mentor.exception.CustomMentorException;
 import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
@@ -62,6 +63,10 @@ public class Post {
     @Enumerated(EnumType.STRING)
     private ChatRoomType chatRoomType;
 
+    //개설된 채팅방
+    @OneToOne(mappedBy = "post")
+    private ChatRoom chatRoom;
+
     //현재 신청자 수
     @Builder.Default
     private int currentApplicants = 0;
@@ -91,10 +96,17 @@ public class Post {
         this.tags.clear();
     }
 
-    public void modifyPost(String title, String content, List<PostTag> postTags) {
+    public void setChatRoom(ChatRoom chatRoom) {
+        this.chatRoom = chatRoom;
+    }
+
+    public void modifyPost(String title, String content, List<PostTag> postTags, int capacity) {
         this.title = title;
         this.content = content;
         this.tags.addAll(postTags);
+        if (currentApplicants > capacity) {
+            throw new CustomMentorException(ErrorCode.CAPACITY_NOT_ENOUGH);
+        }
     }
 /* => Applicant엔티티 도입
 
@@ -109,9 +121,9 @@ public class Post {
     private List<Member> applicants = new ArrayList<>();
 */
 
-
+/* Applicant 편의 메서드*/
     //신청자 추가
-    public void addApplicant(Member member) {
+    public void addApplicant(Member member,String nickname) {
         try {
             if (isClosed) {
                 throw new RuntimeException("모집 마감된 게시글입니다");
@@ -130,6 +142,7 @@ public class Post {
             this.applicants.add(Applicant.builder()
                     .post(this)
                     .member(member)
+                    .nickname(nickname)
                     .build());
 
             if (this.currentApplicants >= this.capacity) {

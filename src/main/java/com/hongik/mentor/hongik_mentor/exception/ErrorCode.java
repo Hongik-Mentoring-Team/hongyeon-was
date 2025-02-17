@@ -22,7 +22,9 @@ public enum ErrorCode {
 
     DUPLICATE_MENTORING_APPLY(HttpStatus.BAD_REQUEST,"이미 지원된 게시글 입니다."),
 
-    FAILED_TO_APPLY(HttpStatus.BAD_REQUEST, "지원 과정에서 오류가 발생했습니다");
+    FAILED_TO_APPLY(HttpStatus.BAD_REQUEST, "지원 과정에서 오류가 발생했습니다"),
+
+    CAPACITY_NOT_ENOUGH(HttpStatus.BAD_REQUEST, "모집인원이 기신청자 수를 충족시키지 못합니다.");
 
 
     private final HttpStatus httpStatus;

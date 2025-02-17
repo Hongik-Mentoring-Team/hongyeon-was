@@ -109,6 +109,10 @@ public class MemberService {
         return collect;
     }
 
+    public Long getMemberIdOnlyForAdmin(String socialId, SocialProvider socialProvider) {
+        Long memberid = memberRepository.findBySocialId(socialId, socialProvider).orElseThrow().getId();
+        return memberid;
+    }
     //Update
 
     @Transactional

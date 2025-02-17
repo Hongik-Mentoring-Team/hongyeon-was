@@ -1,5 +1,7 @@
 package com.hongik.mentor.hongik_mentor.controller.dto;
 
+import com.hongik.mentor.hongik_mentor.domain.Category;
+import com.hongik.mentor.hongik_mentor.domain.chat.ChatRoomType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -10,12 +12,12 @@ import java.util.List;
 @AllArgsConstructor
 public class PostModifyDTO {
 
-
     private String title;
 
     private String content;
 
-    private List<Long> tagIds = new ArrayList<>();
+    private List<Long> tagIds;
 
-    private Long memberId;
+    private int capacity; //모집인원
+
 }

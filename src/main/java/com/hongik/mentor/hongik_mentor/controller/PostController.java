@@ -4,18 +4,21 @@ import com.hongik.mentor.hongik_mentor.controller.dto.PostCreateDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostModifyDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.SearchByTagDto;
+import com.hongik.mentor.hongik_mentor.controller.dto.comment.CommentModifyDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.comment.CommentReqDto;
 import com.hongik.mentor.hongik_mentor.domain.Category;
 import com.hongik.mentor.hongik_mentor.domain.Tag;
 import com.hongik.mentor.hongik_mentor.oauth.util.SessionUtil;
 import com.hongik.mentor.hongik_mentor.service.PostService;
 import com.hongik.mentor.hongik_mentor.service.dto.PostLikeDTO;
+import com.sun.net.httpserver.HttpsServer;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,9 +53,9 @@ public class PostController {
         return ResponseEntity.ok(modifiedPost);
     }
 
-    @DeleteMapping("/post{postId}")
-    public ResponseEntity<?> deletePost(@PathVariable Long postId) {
-        postService.deletePost(postId);
+    @DeleteMapping("/post/{postId}")
+    public ResponseEntity<?> deletePost(@PathVariable Long postId, HttpSession httpSession) {
+        postService.deletePost(postId, SessionUtil.getCurrentMemberId(httpSession));
 
         return ResponseEntity.noContent().build();
     }
@@ -95,14 +98,28 @@ public class PostController {
         return ResponseEntity.ok().body("댓글을 달았습니다");
     }
 
+    @PutMapping("/post/{postId}/comments/{commentId}")
+    public ResponseEntity<?> modifyComment(@PathVariable Long postId,
+                                           @PathVariable Long commentId,
+                                           @RequestBody CommentModifyDto dto,
+                                           HttpSession httpSession) {
+
+        postService.modifyComment(postId, commentId, dto, httpSession);
+
+        return ResponseEntity.ok().body("댓글을 수정하였습니다");
+    }
+
     /**
      * Applicant API
      */
     @GetMapping("/post/{postId}/apply")
-    public ResponseEntity<?> createApplicant(@PathVariable Long postId, HttpSession httpSession) {
+    public ResponseEntity<?> createApplicant(@PathVariable Long postId,
+                                             @RequestParam String nickname,
+                                             HttpSession httpSession) {
         Long applicantId = SessionUtil.getCurrentMemberId(httpSession);
-        postService.applyToPost(postId,applicantId);
+        postService.applyToPost(postId,applicantId, nickname);
 
         return ResponseEntity.ok().body("지원에 성공했습니다!");
     }
+
 }

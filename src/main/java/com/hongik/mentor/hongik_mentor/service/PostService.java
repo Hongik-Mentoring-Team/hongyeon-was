@@ -3,15 +3,18 @@ package com.hongik.mentor.hongik_mentor.service;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostCreateDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostModifyDTO;
+import com.hongik.mentor.hongik_mentor.controller.dto.comment.CommentModifyDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.comment.CommentReqDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.comment.CommentResDto;
 import com.hongik.mentor.hongik_mentor.domain.*;
 import com.hongik.mentor.hongik_mentor.exception.CustomMentorException;
 import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
+import com.hongik.mentor.hongik_mentor.oauth.util.SessionUtil;
 import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
 import com.hongik.mentor.hongik_mentor.repository.PostRepository;
 import com.hongik.mentor.hongik_mentor.repository.TagRepository;
 import jakarta.persistence.OptimisticLockException;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +43,7 @@ public class PostService {
                 .title(postCreateDTO.getTitle())
                 .content(postCreateDTO.getContent())
                 .category(postCreateDTO.getCategory())
-                .capacity(postCreateDTO.getCategory() == Category.MENTOR ? postCreateDTO.getCapacity() : -1)
+                .capacity(postCreateDTO.getCategory() == Category.MENTOR ? postCreateDTO.getCapacity() : 1)
                 .build();
 
         postCreateDTO.getTagIds()
@@ -83,11 +86,12 @@ public class PostService {
 
         List<PostTag> postTags = tags.stream().map(tag -> PostTag.builder()
                 .post(post)
-                .tag(tag).build()).toList();
+                .tag(tag)
+                .build()).toList();
 
         post.clearTags();
 
-        post.modifyPost(postModifyDTO.getTitle(), postModifyDTO.getContent(), postTags);
+        post.modifyPost(postModifyDTO.getTitle(), postModifyDTO.getContent(), postTags, postModifyDTO.getCapacity());
 
         postRepository.save(post);
 
@@ -96,11 +100,18 @@ public class PostService {
     }
 
     @Transactional
-    public Long deletePost(Long postId){
-        postRepository.deleteById(postId);
+    public Long deletePost(Long postId, Long requesterId){
+        Post findPost = postRepository.findById(postId).orElseThrow();
+        if (isEntityOwner(requesterId, findPost.getMember().getId())) {
+            postRepository.deleteById(postId);
+        } else {
+            throw new RuntimeException("해당 게시글의 소유자가 아닙니다");
+        }
 
         return postId;
     }
+
+
 
 
     public List<PostDTO> searchPostsByTags(Category category, List<Long> tagIds) {
@@ -145,14 +156,14 @@ public class PostService {
 
     // 모집 지원 기능
     @Transactional
-    public void applyToPost(Long postId, Long memberId) {
+    public void applyToPost(Long postId, Long memberId, String nickname) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
 
         Member member = memberRepository.findById(memberId).orElseThrow();
 
         try {
-            post.addApplicant(member);
+            post.addApplicant(member, nickname);
         } catch (OptimisticLockException e) {
             throw new RuntimeException("다시 시도해 주세요.");
         }
@@ -211,5 +222,23 @@ public class PostService {
                 .build());
 
         postRepository.save(findPost);
+    }
+
+    @Transactional
+    public void modifyComment(Long postId, Long commentId, CommentModifyDto dto, HttpSession httpSession) {
+
+        //미완. 추가 작업 필요
+
+        /*Post findPost = postRepository.findById(postId).orElseThrow();
+
+        if(isEntityOwner(SessionUtil.getCurrentMemberId(httpSession)),)*/
+    }
+
+    /**
+     * Utility
+     * */
+    //요청자가 해당 엔티티의 주인인지 검증
+    private static boolean isEntityOwner(Long requesterId, Long entityOwnerId) {
+        return requesterId.equals(entityOwnerId);
     }
 }
