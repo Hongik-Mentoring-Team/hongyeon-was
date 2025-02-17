@@ -14,6 +14,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -97,5 +98,8 @@ public class PostDTO {
                 .isClosed(post.isClosed())
                 .chatRoomId(post.getChatRoom()==null?-1:post.getChatRoom().getId())
                 .build();
+
+
     }
+
 }

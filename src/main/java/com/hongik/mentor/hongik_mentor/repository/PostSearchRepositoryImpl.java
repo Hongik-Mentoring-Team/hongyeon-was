@@ -4,7 +4,6 @@ import com.hongik.mentor.hongik_mentor.domain.*;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.Optional;

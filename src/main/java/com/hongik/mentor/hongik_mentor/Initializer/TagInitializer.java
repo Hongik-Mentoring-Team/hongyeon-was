@@ -57,8 +57,5 @@ public class TagInitializer {
         if (!tagsToRemove.isEmpty()) {
             tagRepository.deleteAll(tagsToRemove);
         }
-
-
-
     }
 }

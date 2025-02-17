@@ -92,6 +92,10 @@ public class Post {
         this.likes.add(like);
     }
 
+    public void addComment(Comment comment){
+        this.comments.add(comment);
+    }
+
     public void clearTags(){
         this.tags.clear();
     }

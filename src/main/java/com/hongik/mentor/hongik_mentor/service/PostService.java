@@ -16,6 +16,7 @@ import com.hongik.mentor.hongik_mentor.repository.TagRepository;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.h2.api.ErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +37,8 @@ public class PostService {
     @Transactional
     public Long createPost(PostCreateDTO postCreateDTO, Long memberId) {
 
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(()->new CustomMentorException(ErrorCode.MEMBER_NOT_EXISTS));
 
         Post post = Post.builder()
                 .member(member)
@@ -58,9 +60,9 @@ public class PostService {
         return post.getId();
     }
 
-    public PostDTO getPost(Long postId, Long requesterId){
+    public PostDTO getPost(Long postId){
 
-        Post post = postRepository.getPostById(postId)
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
 
         List<CommentResDto> commentResDtos = post.getComments().stream()
@@ -77,7 +79,7 @@ public class PostService {
     @Transactional
     public Long modifyPost(Long postId, PostModifyDTO postModifyDTO) {
 
-        Post post = postRepository.getPostById(postId)
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
 
         List<Tag> tags = postModifyDTO.getTagIds().stream()
@@ -141,17 +143,21 @@ public class PostService {
 
         Member member = memberRepository.findById(memberId).orElseThrow();
 
+        addLikesToPost(member, post);
+
+        postRepository.save(post);
+
+        return post.getId();
+
+    }
+
+    private void addLikesToPost(Member member, Post post) {
         PostLike postLike = PostLike.builder()
                 .member(member)
                 .post(post)
                 .build();
 
         post.addLikes(postLike);
-
-        postRepository.save(post);
-
-        return post.getId();
-
     }
 
     // 모집 지원 기능
@@ -160,7 +166,8 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
 
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.MEMBER_NOT_EXISTS));
 
         try {
             post.addApplicant(member, nickname);
@@ -194,7 +201,8 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
 
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomMentorException(ErrorCode.MEMBER_NOT_EXISTS));
 
         post.cancelApplicant(member);
         postRepository.save(post);

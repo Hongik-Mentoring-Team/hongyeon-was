@@ -1,6 +1,7 @@
 package com.hongik.mentor.hongik_mentor.domain;
 
 
+import com.hongik.mentor.hongik_mentor.domain.post.Post;
 import com.hongik.mentor.hongik_mentor.domain.tier.Tier;
 import com.hongik.mentor.hongik_mentor.domain.tier.TierAssigner;
 import jakarta.persistence.*;

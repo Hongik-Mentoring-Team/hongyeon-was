@@ -1,7 +1,6 @@
 package com.hongik.mentor.hongik_mentor.service;
 
 import com.hongik.mentor.hongik_mentor.controller.dto.FollowRequestDTO;
-import com.hongik.mentor.hongik_mentor.controller.dto.MemberAdminDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.MemberResponseDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.MemberSaveDto;
 import com.hongik.mentor.hongik_mentor.domain.Follow;
@@ -109,10 +108,6 @@ public class MemberService {
         return collect;
     }
 
-    public Long getMemberIdOnlyForAdmin(String socialId, SocialProvider socialProvider) {
-        Long memberid = memberRepository.findBySocialId(socialId, socialProvider).orElseThrow().getId();
-        return memberid;
-    }
     //Update
 
     @Transactional
@@ -138,9 +133,9 @@ public class MemberService {
 
     @Transactional
     public Long followMember(FollowRequestDTO followRequestDTO){ // followerId : 팔로우를 하려는 회원, followingId : 팔로우를 당하는 회원
-        Member follower = memberRepository.findById(followRequestDTO.getFollowerId()).orElseThrow();
+        Member follower = memberRepository.findById(followRequestDTO.getFollowerId());
 
-        Member followee = memberRepository.findById(followRequestDTO.getFolloweeId()).orElseThrow();
+        Member followee = memberRepository.findById(followRequestDTO.getFolloweeId());
 
         Follow follow = Follow.builder()
                 .follower(follower)
@@ -166,6 +161,21 @@ public class MemberService {
         followRepository.delete(follow);
 
 //        followRepository.deleteById(followId);
+    }
+
+    public FollowStatusDto getFollowStatus(Long memberId){
+
+        int numOfFollowers = followRepository.countByFollowerId(memberId);
+
+        int numOfFollowings = followRepository.countByFollowingId(memberId);
+
+
+        return FollowStatusDto.builder()
+                .memberId(memberId)
+                .followers(numOfFollowers)
+                .followings(numOfFollowings)
+                .build();
+
     }
 
 

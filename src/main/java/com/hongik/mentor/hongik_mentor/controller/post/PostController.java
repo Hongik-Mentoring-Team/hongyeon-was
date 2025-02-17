@@ -4,6 +4,7 @@ import com.hongik.mentor.hongik_mentor.controller.dto.PostCreateDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostModifyDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.SearchByTagDto;
+import com.hongik.mentor.hongik_mentor.controller.swagger.PostControllerDocs;
 import com.hongik.mentor.hongik_mentor.controller.dto.comment.CommentModifyDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.comment.CommentReqDto;
 import com.hongik.mentor.hongik_mentor.domain.Category;
@@ -27,7 +28,7 @@ import java.util.List;
 @RequestMapping("/api/v1")
 @RestController
 @RequiredArgsConstructor
-public class PostController {
+public class PostController implements PostControllerDocs {
 
     private final PostService postService;
 
