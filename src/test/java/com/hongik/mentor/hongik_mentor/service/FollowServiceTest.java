@@ -9,17 +9,11 @@ import com.hongik.mentor.hongik_mentor.exception.CustomMentorException;
 import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
 import com.hongik.mentor.hongik_mentor.repository.FollowRepository;
 import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -165,9 +159,9 @@ public class FollowServiceTest {
 
 
         //when
-        int numOfFollowers = followRepository.countByFollowingId(member1.getId());
+        int numOfFollowers = followRepository.countByFolloweeId(member1.getId());
 
-        List<Follow> followers = followRepository.findByFollowingId(member1.getId());
+        List<Follow> followers = followRepository.findByFolloweeId(member1.getId());
 
         //then
         assertThat(numOfFollowers).isEqualTo(2);

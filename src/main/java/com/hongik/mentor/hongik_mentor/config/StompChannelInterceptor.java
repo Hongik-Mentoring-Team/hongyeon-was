@@ -2,6 +2,7 @@ package com.hongik.mentor.hongik_mentor.config;
 
 import com.hongik.mentor.hongik_mentor.constant.ConstantUri;
 import com.hongik.mentor.hongik_mentor.controller.dto.MemberAdminDto;
+import com.hongik.mentor.hongik_mentor.controller.dto.MemberResDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.chat.ChatMessageReqDto;
 import com.hongik.mentor.hongik_mentor.domain.SocialProvider;
 import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
@@ -181,7 +182,7 @@ public class StompChannelInterceptor implements ChannelInterceptor {
         OAuth2User oAuth2User = principal.getPrincipal();
         String socialId = oAuth2User.getName();
         SocialProvider socialProvider = SocialProvider.from((String) oAuth2User.getAttributes().get("socialProvider"));
-        Long currentUserId = memberService.getMemberIdOnlyForAdmin(socialId, socialProvider);
+        Long currentUserId = memberService.getMemberIdOnllyForAdmin(socialId, socialProvider);
         accessor.getSessionAttributes().put("memberId", currentUserId);
         log.info("현재 로그인한 사용자의 memberID를 웹소켓세션에 저장하였습니다. 아이디: {}", currentUserId);
     }

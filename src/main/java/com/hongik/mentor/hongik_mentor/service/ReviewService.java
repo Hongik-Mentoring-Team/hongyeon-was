@@ -1,6 +1,5 @@
 package com.hongik.mentor.hongik_mentor.service;
 
-import com.hongik.mentor.hongik_mentor.controller.dto.MemberResponseDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.ReviewResponseDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.ReviewSaveDto;
 import com.hongik.mentor.hongik_mentor.domain.Member;

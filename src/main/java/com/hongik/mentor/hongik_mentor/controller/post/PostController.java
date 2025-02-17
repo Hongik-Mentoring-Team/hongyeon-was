@@ -8,7 +8,7 @@ import com.hongik.mentor.hongik_mentor.controller.swagger.PostControllerDocs;
 import com.hongik.mentor.hongik_mentor.controller.dto.comment.CommentModifyDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.comment.CommentReqDto;
 import com.hongik.mentor.hongik_mentor.domain.Category;
-import com.hongik.mentor.hongik_mentor.domain.Tag;
+import com.hongik.mentor.hongik_mentor.domain.post.Tag;
 import com.hongik.mentor.hongik_mentor.oauth.util.SessionUtil;
 import com.hongik.mentor.hongik_mentor.service.PostService;
 import com.hongik.mentor.hongik_mentor.service.dto.PostLikeDTO;

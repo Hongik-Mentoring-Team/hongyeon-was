@@ -2,21 +2,17 @@ package com.hongik.mentor.hongik_mentor.controller.dto;
 
 import com.hongik.mentor.hongik_mentor.domain.*;
 import com.hongik.mentor.hongik_mentor.domain.tier.Tier;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.OneToMany;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-
+/** 관리자용 DTO
+ * Member PK를 포함함: HTTP 응답으로 보내지 않는다
+ * */
 @Getter
-public class MemberResponseDto {
+public class MemberResDto {
 
     private String socialId;    //socialId+provider를 조합하여 유저를 구분함
     private SocialProvider socialProvider;
@@ -39,7 +35,7 @@ public class MemberResponseDto {
     private List<ReviewResponseDto> receivedReviews = new ArrayList<>();
 
 
-    public MemberResponseDto(Member member) {
+    public MemberResDto(Member member) {
         this.socialId = member.getSocialId();
         this.socialProvider = member.getSocialProvider();
         this.name=member.getName();

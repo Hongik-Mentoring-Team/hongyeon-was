@@ -1,6 +1,10 @@
 package com.hongik.mentor.hongik_mentor.repository;
 
-import com.hongik.mentor.hongik_mentor.domain.*;
+import com.hongik.mentor.hongik_mentor.domain.Category;
+import com.hongik.mentor.hongik_mentor.domain.post.Post;
+import com.hongik.mentor.hongik_mentor.domain.post.QPost;
+import com.hongik.mentor.hongik_mentor.domain.post.QPostTag;
+import com.hongik.mentor.hongik_mentor.domain.post.QTag;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

@@ -1,8 +1,7 @@
 package com.hongik.mentor.hongik_mentor.controller.dto.comment;
 
-import com.hongik.mentor.hongik_mentor.domain.Comment;
 import com.hongik.mentor.hongik_mentor.domain.Member;
-import com.hongik.mentor.hongik_mentor.domain.Post;
+import com.hongik.mentor.hongik_mentor.domain.post.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,7 +28,7 @@ public class CommentResDto {
     //댓글 작성자가 요청자와 같은지 정보 제공 O(같다면 댓글 삭제가 가능)
     public CommentResDto(Comment comment, boolean isOwner) {
         this.commentId = comment.getId();
-        this.comment = comment.getComment();
+        this.comment = comment.getContent();
         this.postId =comment.getPost().getId();
         this.memberId = comment.getMember().getId();
         this.createdAt = comment.getCreatedAt();
@@ -39,7 +38,7 @@ public class CommentResDto {
     //댓글 작성자가 요청자와 같은지 정보 제공 X(같다면 댓글 삭제가 가능)
     public CommentResDto(Comment comment) {
         this.commentId = comment.getId();
-        this.comment = comment.getComment();
+        this.comment = comment.getContent();
         this.postId =comment.getPost().getId();
         this.memberId = comment.getMember().getId();
         this.createdAt = comment.getCreatedAt();

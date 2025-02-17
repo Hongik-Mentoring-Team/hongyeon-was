@@ -1,6 +1,6 @@
 package com.hongik.mentor.hongik_mentor.Initializer;
 
-import com.hongik.mentor.hongik_mentor.domain.Tag;
+import com.hongik.mentor.hongik_mentor.domain.post.Tag;
 import com.hongik.mentor.hongik_mentor.repository.TagRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

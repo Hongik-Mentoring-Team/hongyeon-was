@@ -7,6 +7,7 @@ import com.hongik.mentor.hongik_mentor.controller.dto.comment.CommentModifyDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.comment.CommentReqDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.comment.CommentResDto;
 import com.hongik.mentor.hongik_mentor.domain.*;
+import com.hongik.mentor.hongik_mentor.domain.post.*;
 import com.hongik.mentor.hongik_mentor.exception.CustomMentorException;
 import com.hongik.mentor.hongik_mentor.exception.ErrorCode;
 import com.hongik.mentor.hongik_mentor.oauth.util.SessionUtil;
@@ -16,7 +17,6 @@ import com.hongik.mentor.hongik_mentor.repository.TagRepository;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.h2.api.ErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,7 +60,7 @@ public class PostService {
         return post.getId();
     }
 
-    public PostDTO getPost(Long postId){
+    public PostDTO getPost(Long postId, Long requesterId){    //추후 함수 getPost함수 이름을 별도로 빼서 순수하게 post조회하는 함수 생성해야할듯
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomMentorException(ErrorCode.POST_NOT_EXISTS));
@@ -226,7 +226,7 @@ public class PostService {
         findPost.getComments().add(Comment.builder()
                 .post(findPost)
                 .member(findMember)
-                .comment(dto.getComment())
+                .content(dto.getComment())
                 .build());
 
         postRepository.save(findPost);

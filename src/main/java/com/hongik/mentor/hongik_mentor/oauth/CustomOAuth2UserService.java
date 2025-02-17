@@ -1,12 +1,10 @@
 package com.hongik.mentor.hongik_mentor.oauth;
 
-import com.hongik.mentor.hongik_mentor.controller.dto.MemberResponseDto;
 import com.hongik.mentor.hongik_mentor.domain.Member;
 import com.hongik.mentor.hongik_mentor.domain.SocialProvider;
 import com.hongik.mentor.hongik_mentor.oauth.dto.OAuthAttributes;
 import com.hongik.mentor.hongik_mentor.oauth.dto.SessionMember;
 import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
-import com.hongik.mentor.hongik_mentor.service.MemberService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

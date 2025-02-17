@@ -1,14 +1,12 @@
 package com.hongik.mentor.hongik_mentor.service;
 
-import com.hongik.mentor.hongik_mentor.controller.dto.MemberResponseDto;
+import com.hongik.mentor.hongik_mentor.controller.dto.MemberResDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.MemberSaveDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.ReviewResponseDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.ReviewSaveDto;
 import com.hongik.mentor.hongik_mentor.domain.Member;
-import com.hongik.mentor.hongik_mentor.domain.Review;
 import com.hongik.mentor.hongik_mentor.domain.SocialProvider;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -59,7 +57,7 @@ class ReviewServiceTest {
 
         //when
         ReviewResponseDto findReview = reviewService.findById(dto.getId());
-        MemberResponseDto dto1 = memberService.findById(id1);
+        MemberResDto dto1 = memberService.findById(id1);
         List<ReviewResponseDto> receivedReviews = memberService.findById(id2).getReceivedReviews();
         List<ReviewResponseDto> writtedReviews = dto1.getWrittedReviews();
 

@@ -6,9 +6,9 @@ import com.hongik.mentor.hongik_mentor.controller.dto.chat.ChatMessageResponseDt
 import com.hongik.mentor.hongik_mentor.controller.dto.chat.ChatRoomDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.chat.ChatRoomResponseDto;
 import com.hongik.mentor.hongik_mentor.domain.Category;
-import com.hongik.mentor.hongik_mentor.domain.Post;
 import com.hongik.mentor.hongik_mentor.domain.SocialProvider;
 import com.hongik.mentor.hongik_mentor.domain.chat.ChatRoomType;
+import com.hongik.mentor.hongik_mentor.domain.post.Post;
 import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;

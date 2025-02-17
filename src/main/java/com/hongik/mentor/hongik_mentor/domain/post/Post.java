@@ -1,7 +1,10 @@
-package com.hongik.mentor.hongik_mentor.domain;
+package com.hongik.mentor.hongik_mentor.domain.post;
 
 import com.hongik.mentor.hongik_mentor.controller.dto.PostCreateDTO;
 import com.hongik.mentor.hongik_mentor.controller.dto.PostModifyDTO;
+import com.hongik.mentor.hongik_mentor.domain.Applicant;
+import com.hongik.mentor.hongik_mentor.domain.Category;
+import com.hongik.mentor.hongik_mentor.domain.Member;
 import com.hongik.mentor.hongik_mentor.domain.chat.ChatRoom;
 import com.hongik.mentor.hongik_mentor.domain.chat.ChatRoomType;
 import com.hongik.mentor.hongik_mentor.exception.CustomMentorException;

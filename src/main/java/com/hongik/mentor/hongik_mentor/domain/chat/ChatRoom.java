@@ -1,7 +1,7 @@
 package com.hongik.mentor.hongik_mentor.domain.chat;
 
 import com.hongik.mentor.hongik_mentor.domain.Member;
-import com.hongik.mentor.hongik_mentor.domain.Post;
+import com.hongik.mentor.hongik_mentor.domain.post.Post;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

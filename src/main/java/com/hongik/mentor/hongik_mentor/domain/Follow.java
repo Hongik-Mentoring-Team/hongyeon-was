@@ -17,7 +17,7 @@ public class Follow {
     private Member follower;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "following_id")
+    @JoinColumn(name = "followee_id")
     private Member followee;    //from근호: following은 헷갈려서 바꿔요 ㅠ
 
     @Builder

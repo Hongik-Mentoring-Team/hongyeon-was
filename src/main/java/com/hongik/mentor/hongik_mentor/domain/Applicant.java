@@ -1,5 +1,6 @@
 package com.hongik.mentor.hongik_mentor.domain;
 
+import com.hongik.mentor.hongik_mentor.domain.post.Post;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,7 +1,8 @@
 package com.hongik.mentor.hongik_mentor.service;
 
 import com.hongik.mentor.hongik_mentor.controller.dto.FollowRequestDTO;
-import com.hongik.mentor.hongik_mentor.controller.dto.MemberResponseDto;
+import com.hongik.mentor.hongik_mentor.controller.dto.MemberResDto;
+import com.hongik.mentor.hongik_mentor.controller.dto.MemberAdminDto;
 import com.hongik.mentor.hongik_mentor.controller.dto.MemberSaveDto;
 import com.hongik.mentor.hongik_mentor.domain.Follow;
 import com.hongik.mentor.hongik_mentor.domain.Badge;
@@ -16,6 +17,7 @@ import com.hongik.mentor.hongik_mentor.repository.FollowRepository;
 
 import com.hongik.mentor.hongik_mentor.repository.BadgeRepository;
 import com.hongik.mentor.hongik_mentor.repository.MemberRepository;
+import com.hongik.mentor.hongik_mentor.service.dto.FollowStatusDto;
 import com.univcert.api.UnivCert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -92,20 +94,25 @@ public class MemberService {
     }
 
     //Read
-    public MemberResponseDto findById(Long id) {
+    public MemberResDto findById(Long id) {
         Member findMember = memberRepository.findById(id).orElseThrow();
 
-        return new MemberResponseDto(findMember);
+        return new MemberResDto(findMember);
     }
 
-    public List<MemberResponseDto> findAll() {
+    public List<MemberResDto> findAll() {
 
-        List<MemberResponseDto> collect = memberRepository.findAll()
+        List<MemberResDto> collect = memberRepository.findAll()
                 .stream()
-                .map(MemberResponseDto::new)
+                .map(MemberResDto::new)
                 .collect(Collectors.toList());
 
         return collect;
+    }
+
+    public Long getMemberIdOnllyForAdmin(String socialId, SocialProvider socialProvider) {
+        Long memberid = memberRepository.findBySocialId(socialId, socialProvider).orElseThrow().getId();
+        return memberid;
     }
 
     //Update
@@ -133,9 +140,9 @@ public class MemberService {
 
     @Transactional
     public Long followMember(FollowRequestDTO followRequestDTO){ // followerId : 팔로우를 하려는 회원, followingId : 팔로우를 당하는 회원
-        Member follower = memberRepository.findById(followRequestDTO.getFollowerId());
+        Member follower = memberRepository.findById(followRequestDTO.getFollowerId()).orElseThrow();
 
-        Member followee = memberRepository.findById(followRequestDTO.getFolloweeId());
+        Member followee = memberRepository.findById(followRequestDTO.getFolloweeId()).orElseThrow();
 
         Follow follow = Follow.builder()
                 .follower(follower)
@@ -167,7 +174,7 @@ public class MemberService {
 
         int numOfFollowers = followRepository.countByFollowerId(memberId);
 
-        int numOfFollowings = followRepository.countByFollowingId(memberId);
+        int numOfFollowings = followRepository.countByFolloweeId(memberId);
 
 
         return FollowStatusDto.builder()
